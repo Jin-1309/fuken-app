@@ -279,12 +279,28 @@
     }
 
     function getCategory(q) {
+        // 1. JSONにカテゴリーが指定されていればそれを最優先する
         if (q.category) return q.category;
+        
+        // 2. 問題のタイプで判定
         if (q.type === 'gender') return "名詞の性";
-        const qText = q.word_or_question || "";
-        if (qText.includes('de') || qText.includes('à') || q.level === '2級') return "前置詞・文法";
-        if (q.meaning.includes('ばかり') || q.meaning.includes('つもり')) return "動詞の活用";
-        return "熟語・表現";
+
+        const comment = q.comment || "";
+        const meaning = q.meaning || "";
+
+        // 3. 2級などの高度な問題をキーワードで分類
+        if (comment.includes("熟語") || comment.includes("慣用") || meaning.includes("…")) {
+            return "熟語・表現";
+        }
+        if (comment.includes("語彙") || comment.includes("意味")) {
+            return "熟語・表現";
+        }
+        if (comment.includes("活用") || comment.includes("不定詞") || meaning.includes("ばかり") || meaning.includes("つもり")) {
+            return "動詞の活用";
+        }
+
+        // 4. デフォルト（基本は文法扱い）
+        return "前置詞・文法";
     }
 
     function showQuestion() {
