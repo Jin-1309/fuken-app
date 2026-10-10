@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検完全対策：フラ単ナビ</title>
+    <title>仏検対策：フラ単ナビ</title>
     <style>
         :root { --primary: #002395; --accent: #EF4135; --bg: #f0f2f5; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
@@ -15,14 +15,19 @@
         h1 { color: var(--primary); font-size: 1.5rem; margin-bottom: 1.5rem; }
         .level-badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 0.5rem; display: inline-block; }
 
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .menu-btn { padding: 15px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.3s; background: white; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .menu-btn { padding: 12px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.3s; background: white; }
         .menu-btn:hover:not(:disabled) { border-color: var(--primary); background: #f0f4ff; }
+        .mode-btn { background-color: #f8f9fa; border-style: dashed; font-size: 0.9rem; margin-top: 10px; }
 
         .question-text { font-size: 1.4rem; font-weight: bold; margin: 1.5rem 0; min-height: 4rem; display: flex; align-items: center; justify-content: center; }
         .meaning { color: #666; margin-bottom: 1.5rem; font-size: 0.95rem; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
+        #typing-container { display: none; margin-top: 1rem; }
+        #typing-input { width: 85%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 10px; text-align: center; }
+        .hint { font-size: 0.8rem; color: #888; margin-top: 5px; }
+
         button:disabled { opacity: 0.6; cursor: not-allowed; }
         #feedback { margin-top: 1rem; font-weight: bold; height: 1.5rem; font-size: 1.2rem; }
         .progress { margin-top: 1rem; color: #888; font-size: 0.8rem; }
@@ -31,37 +36,39 @@
 <body>
 
 <div id="app-container">
-    <!-- 読み込み中画面 -->
-    <div id="loading-screen" class="screen active">
-        <h1>Loading...</h1>
-        <p>問題を読み込んでいます</p>
-    </div>
+    <div id="loading-screen" class="screen active"><h1>Loading...</h1></div>
 
-    <!-- メニュー画面 -->
     <div id="menu-screen" class="screen">
         <h1>仏検対策ドリル</h1>
-        <p>級を選んでスタート！</p>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startQuiz('5級')">5級レベル</button>
-            <button class="menu-btn" onclick="startQuiz('4級')">4級レベル</button>
-            <button class="menu-btn" onclick="startQuiz('3級')">3級レベル</button>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+            <button class="menu-btn" style="background: #eef;" onclick="startQuiz('ALL', 'choice')">全級ミックス (4択)</button>
+            <button class="menu-btn mode-btn" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング (un/une)</button>
         </div>
     </div>
 
-    <!-- クイズ画面 -->
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
+        
         <div id="choices-container" class="grid-choices"></div>
+        
+        <div id="typing-container">
+            <input type="text" id="typing-input" autocomplete="off" spellcheck="false">
+            <div id="input-hint" class="hint">Enterキーで決定</div>
+        </div>
+
         <div id="feedback"></div>
         <div class="progress">問題: <span id="current-count">0</span> / 10</div>
     </div>
 
-    <!-- 結果画面 -->
     <div id="result-screen" class="screen">
         <h2>結果発表</h2>
         <div style="font-size: 4rem; font-weight: bold; color: var(--primary);" id="final-score">0</div>
+        <p id="evaluation-msg"></p>
         <button class="menu-btn" style="width:100%; margin-top:1rem;" onclick="location.reload()">メニューに戻る</button>
     </div>
 </div>
@@ -71,8 +78,8 @@
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
+    let currentMode = 'choice';
 
-    // 音を出す設定
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(isCorrect) {
         const osc = audioCtx.createOscillator();
@@ -84,23 +91,23 @@
         osc.stop(audioCtx.currentTime + 0.5);
     }
 
-    // JSONを読み込む
     async function loadData() {
         try {
-            // URLはGitHub Pagesにアップした後、'questions.json' のままでOKです
             const response = await fetch('questions.json');
-            if (!response.ok) throw new Error('Network response was not ok');
             database = await response.json();
             switchScreen('menu-screen');
         } catch (error) {
-            document.getElementById('loading-screen').innerHTML = "<h1>Error</h1><p>問題データの読み込みに失敗しました。</p>";
-            console.error("Failed to load questions:", error);
+            document.getElementById('loading-screen').innerHTML = "<h1>Error</h1>";
         }
     }
 
-    function startQuiz(lvl) {
-        currentQuestions = database.filter(q => q.level === lvl).sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("まだ問題がありません");
+    function startQuiz(lvl, mode) {
+        currentMode = mode;
+        currentQuestions = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
+        currentQuestions = currentQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        if (currentQuestions.length === 0) return alert("問題がありません");
+        
         currentIndex = 0; score = 0;
         switchScreen('quiz-screen');
         showQuestion();
@@ -108,31 +115,76 @@
 
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById('level-tag').textContent = q.level;
+        document.getElementById('level-tag').textContent = q.level + (currentMode === 'typing' ? ' [タイピング]' : '');
         document.getElementById('current-count').textContent = currentIndex + 1;
         document.getElementById('feedback').textContent = "";
-        
         document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
         document.getElementById('meaning-display').textContent = q.meaning;
         
-        const container = document.getElementById('choices-container');
-        container.innerHTML = "";
-        
-        const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c);
-        
-        choices.forEach(c => {
-            const btn = document.createElement('button');
-            btn.className = 'menu-btn';
-            btn.textContent = c;
-            btn.onclick = () => check(c, q.answer);
-            container.appendChild(btn);
-        });
+        const choicesContainer = document.getElementById('choices-container');
+        const typingContainer = document.getElementById('typing-container');
+        const inputField = document.getElementById('typing-input');
+
+        if (currentMode === 'choice') {
+            choicesContainer.style.display = 'grid';
+            typingContainer.style.display = 'none';
+            choicesContainer.innerHTML = "";
+            const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c);
+            choices.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                btn.textContent = c;
+                btn.onclick = () => check(c, q.answer);
+                choicesContainer.appendChild(btn);
+            });
+        } else {
+            choicesContainer.style.display = 'none';
+            typingContainer.style.display = 'block';
+            inputField.value = "";
+            inputField.disabled = false;
+            // ヒント表示の切り替え
+            inputField.placeholder = (q.type === 'gender') ? "un または une" : "答えを入力...";
+            inputField.focus();
+        }
     }
 
+    document.getElementById('typing-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const val = this.value.trim().toLowerCase();
+            if (val) {
+                this.disabled = true;
+                check(val, currentQuestions[currentIndex].answer);
+            }
+        }
+    });
+
     function check(selected, correct) {
-        const isCorrect = (selected === correct);
+        let isCorrect = false;
+        const q = currentQuestions[currentIndex];
+        
+        // 入力値と正解の標準化（小文字にして比較）
+        let userAns = selected.toLowerCase();
+        let targetAns = correct.toLowerCase();
+
+        if (currentMode === 'typing' && q.type === 'gender') {
+            // タイピングモードかつ性別問題の場合の特別ルール
+            if (targetAns === "男性" && userAns === "un") isCorrect = true;
+            if (targetAns === "女性" && userAns === "une") isCorrect = true;
+            // 元の「男性/女性」という入力も一応許容する場合
+            if (userAns === targetAns) isCorrect = true;
+        } else {
+            // それ以外（4択や通常の穴埋め）
+            isCorrect = (userAns === targetAns);
+        }
+
         const fb = document.getElementById('feedback');
-        fb.textContent = isCorrect ? "C'est bien !" : "正解: " + correct;
+        let displayCorrect = correct;
+        // 性別問題の正解表示を分かりやすく
+        if (q.type === 'gender') {
+            displayCorrect = (correct === "男性") ? "un (男性)" : "une (女性)";
+        }
+
+        fb.textContent = isCorrect ? "C'est bien !" : "正解: " + displayCorrect;
         fb.style.color = isCorrect ? "#4CAF50" : "#EF4135";
         
         if (isCorrect) score++;
@@ -143,14 +195,18 @@
 
         setTimeout(() => {
             currentIndex++;
-            if (currentIndex < currentQuestions.length) showQuestion();
-            else showResult();
+            if (currentIndex < 10 && currentIndex < currentQuestions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
         }, 1200);
     }
 
     function showResult() {
         switchScreen('result-screen');
-        document.getElementById('final-score').textContent = score + " / " + currentQuestions.length;
+        document.getElementById('final-score').textContent = score + " / 10";
+        document.getElementById('evaluation-msg').textContent = (score === 10) ? "Bravo ! 完璧です！" : (score >= 7) ? "いいですね！" : "もう一度挑戦！";
     }
 
     function switchScreen(id) {
@@ -158,7 +214,6 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // 起動時にデータを読み込む
     loadData();
 </script>
 </body>
