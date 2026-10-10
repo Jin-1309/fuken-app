@@ -3,123 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検対策：フラ単 Pro</title>
+    <title>仏検対策</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
-        :root { 
-            --primary: #1a2a6c; 
-            --accent: #b21f1f; 
-            --bg: #f8f9fa; 
-            --success: #2d6a4f;
-            --text-main: #2d3436;
-            --card-bg: #ffffff;
-        }
-
-        body { 
-            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; 
-            background-color: var(--bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0;
-            color: var(--text-main);
-        }
-
-        #app-container { 
-            background: var(--card-bg); 
-            padding: 2.5rem 2rem; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05); 
-            width: 95%; 
-            max-width: 420px; 
-            text-align: center; 
-            transition: all 0.3s ease;
-        }
-
+        :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f8f9fa; --success: #2d6a4f; --text-main: #2d3436; --card-bg: #ffffff; }
+        body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--text-main); }
+        #app-container { background: var(--card-bg); padding: 2.5rem 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); width: 95%; max-width: 420px; text-align: center; }
         .screen { display: none; animation: fadeIn 0.4s ease-out; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-weight: 700; font-size: 1.4rem; letter-spacing: -0.5px; margin-bottom: 1.5rem; color: var(--primary); }
-
-        /* バッジ */
-        .level-badge { 
-            background: rgba(26, 42, 108, 0.1); 
-            color: var(--primary); 
-            padding: 6px 16px; 
-            border-radius: 100px; 
-            font-size: 0.75rem; 
-            font-weight: 700; 
-            margin-bottom: 1rem; 
-            display: inline-block; 
-        }
-
-        /* ボタン */
-        .menu-btn { 
-            width: 100%; 
-            padding: 16px; 
-            margin-bottom: 12px; 
-            border: 1px solid #edf2f7; 
-            border-radius: 16px; 
-            cursor: pointer; 
-            font-size: 0.95rem; 
-            font-weight: 600; 
-            background: white; 
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .menu-btn:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-color: var(--primary);
-            background: #fdfdfd;
-        }
+        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--primary); }
+        .level-badge { background: rgba(26, 42, 108, 0.1); color: var(--primary); padding: 6px 16px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; display: inline-block; }
+        .menu-btn { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #edf2f7; border-radius: 16px; cursor: pointer; font-size: 0.95rem; font-weight: 600; background: white; transition: 0.2s; }
+        .menu-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--primary); background: #fdfdfd; }
         .btn-mix { background: var(--primary); color: white; border: none; }
-        .btn-mix:hover { background: #0f1a4a; color: white; }
         .btn-typing { border: 1px dashed var(--primary); color: var(--primary); }
-
-        /* 分析エリア */
-        .stats-card { 
-            background: #fcfcfd; 
-            padding: 1.2rem; 
-            border-radius: 20px; 
-            border: 1px solid #f1f3f5;
-            margin-bottom: 2rem; 
-            text-align: left; 
-        }
+        .stats-card { background: #fcfcfd; padding: 1.2rem; border-radius: 20px; border: 1px solid #f1f3f5; margin-bottom: 2rem; text-align: left; }
         .stat-row { margin-bottom: 12px; }
-        .stat-label { font-size: 0.7rem; font-weight: 700; color: #718096; display: flex; justify-content: space-between; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-label { font-size: 0.7rem; font-weight: 700; color: #718096; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .bar-bg { background: #edf2f7; height: 6px; border-radius: 10px; overflow: hidden; }
-        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.8s ease; }
         .weak { background: var(--accent) !important; }
         .strong { background: var(--success) !important; }
-
-        /* クイズ画面 */
         .question-text { font-size: 1.8rem; font-weight: 700; margin: 1.5rem 0 0.5rem 0; color: #1a202c; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
-        .meaning { color: #a0aec0; margin-bottom: 2rem; font-size: 0.9rem; font-weight: 400; }
+        .meaning { color: #a0aec0; margin-bottom: 2rem; font-size: 0.9rem; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        #typing-input { 
-            width: 90%; padding: 14px; font-size: 1.1rem; border: 2px solid #edf2f7; border-radius: 14px; 
-            text-align: center; margin: 0 auto; outline: none; transition: border-color 0.2s;
-        }
-        #typing-input:focus { border-color: var(--primary); }
-
-        /* フィードバック */
+        #typing-input { width: 90%; padding: 14px; font-size: 1.1rem; border: 2px solid #edf2f7; border-radius: 14px; text-align: center; margin: 0 auto; outline: none; }
         #feedback { margin-top: 1.2rem; font-weight: 700; font-size: 1.1rem; min-height: 1.5rem; }
         #feedback-area { display: none; }
-        #commentary-box { 
-            background: #fffcf0; border-radius: 16px; padding: 1.2rem; margin-top: 1.5rem; 
-            text-align: left; font-size: 0.85rem; line-height: 1.6; color: #4a5568; border: 1px solid #fef3c7;
-        }
-        #audio-repeat-btn { 
-            background: #edf2f7; color: var(--primary); border: none; border-radius: 50%; 
-            width: 44px; height: 44px; cursor: pointer; margin: 1rem auto; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-        }
-
+        #commentary-box { background: #fffcf0; border-radius: 16px; padding: 1.2rem; margin-top: 1.5rem; text-align: left; font-size: 0.85rem; line-height: 1.6; color: #4a5568; border: 1px solid #fef3c7; }
+        #audio-repeat-btn { background: #edf2f7; color: var(--primary); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; margin: 1rem auto; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .next-btn { background: var(--primary); color: white; border: none; margin-top: 1rem; font-weight: 700; }
         .progress { margin-top: 2rem; color: #cbd5e0; font-size: 0.75rem; font-weight: 600; }
         button:disabled { opacity: 0.4; }
@@ -127,16 +40,11 @@
     </style>
 </head>
 <body>
-
 <div id="app-container">
     <div id="loading-screen" class="screen active"><h1>Chargement...</h1></div>
-
     <div id="menu-screen" class="screen">
         <h1>🇫🇷 Progrès</h1>
-        <div class="stats-card">
-            <div id="stats-list"></div>
-            <button class="clear-btn" onclick="clearHistory()">Reset History</button>
-        </div>
+        <div class="stats-card"><div id="stats-list"></div><button class="clear-btn" onclick="clearHistory()">Reset History</button></div>
         <div class="menu-grid">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
@@ -145,31 +53,23 @@
                 <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
             </div>
             <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">All Levels Mix</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ Typing Challenge</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ Typing (le/la/l')</button>
         </div>
     </div>
-
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
-        
         <div id="choices-container" class="grid-choices"></div>
-        <div id="typing-container" style="display:none;">
-            <input type="text" id="typing-input" placeholder="Réponse..." autocomplete="off" spellcheck="false">
-        </div>
-
+        <div id="typing-container" style="display:none;"><input type="text" id="typing-input" autocomplete="off" spellcheck="false"></div>
         <div id="feedback"></div>
-
         <div id="feedback-area">
             <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
             <div id="commentary-box"><span></span></div>
             <button class="menu-btn next-btn" onclick="handleNext()">Continuer</button>
         </div>
-
         <div class="progress">Question <span id="current-count">0</span> / 10</div>
     </div>
-
     <div id="result-screen" class="screen">
         <h2 style="color: var(--primary)">Résultat</h2>
         <div style="font-size: 4.5rem; font-weight: 800; color: var(--primary); margin: 1rem 0;" id="final-score">0</div>
@@ -188,12 +88,9 @@
     let synth = window.speechSynthesis;
     let voices = [];
 
-    // 学習履歴
     let history = JSON.parse(localStorage.getItem('fuken_history')) || {};
 
-    // --- 音声機能の強化 ---
     function initSpeech() {
-        // ブラウザの音声を予熱する（ユーザー操作に紐付ける）
         const silentUtterance = new SpeechSynthesisUtterance("");
         synth.speak(silentUtterance);
         loadVoices();
@@ -208,23 +105,18 @@
 
     function speakFrench(text) {
         if (!synth) return;
-        synth.cancel(); // 前の音声を止める
-        
+        synth.cancel();
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = 'fr-FR';
         uttr.rate = 0.85;
-        
-        // フランス語の音声を探す
         const frVoice = voices.find(v => v.lang.includes('fr'));
         if (frVoice) uttr.voice = frVoice;
-        
         synth.speak(uttr);
         lastSpokenText = text;
     }
 
     function replayAudio() { if (lastSpokenText) speakFrench(lastSpokenText); }
 
-    // 履歴保存と分析表示
     function saveResult(cat, isCorrect) {
         if (!history[cat]) history[cat] = { correct: 0, total: 0 };
         history[cat].total += 1;
@@ -240,19 +132,13 @@
             const data = history[cat] || { correct: 0, total: 0 };
             const percent = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
             let colorClass = (percent < 50 && data.total > 0) ? "weak" : (percent > 80 ? "strong" : "");
-            list.innerHTML += `
-                <div class="stat-row">
-                    <div class="stat-label"><span>${cat}</span><span>${percent}%</span></div>
-                    <div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div>
-                </div>`;
+            list.innerHTML += `<div class="stat-row"><div class="stat-label"><span>${cat}</span><span>${percent}%</span></div><div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div></div>`;
         });
     }
 
     function clearHistory() {
         if (confirm("履歴をリセットしますか？")) {
-            localStorage.removeItem('fuken_history');
-            history = {};
-            renderStats();
+            localStorage.removeItem('fuken_history'); history = {}; renderStats();
         }
     }
 
@@ -263,12 +149,12 @@
             renderStats();
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('menu-screen').classList.add('active');
-            loadVoices(); // 初期ロード
+            loadVoices();
         } catch (e) { document.getElementById('loading-screen').innerHTML = "JSON Load Error"; }
     }
 
     function startQuiz(lvl, mode) {
-        initSpeech(); // ボタンクリック時に音声をアクティブ化
+        initSpeech();
         currentMode = mode;
         let filtered = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -279,33 +165,24 @@
     }
 
     function getCategory(q) {
-        // 1. JSONにカテゴリーが指定されていればそれを最優先する
         if (q.category) return q.category;
-        
-        // 2. 問題のタイプで判定
         if (q.type === 'gender') return "名詞の性";
+        const qText = q.word_or_question || "";
+        if (qText.includes('de') || qText.includes('à') || q.level === '2級') return "前置詞・文法";
+        if (q.meaning.includes('ばかり') || q.meaning.includes('つもり')) return "動詞の活用";
+        return "熟語・表現";
+    }
 
-        const comment = q.comment || "";
-        const meaning = q.meaning || "";
-
-        // 3. 2級などの高度な問題をキーワードで分類
-        if (comment.includes("熟語") || comment.includes("慣用") || meaning.includes("…")) {
-            return "熟語・表現";
-        }
-        if (comment.includes("語彙") || comment.includes("意味")) {
-            return "熟語・表現";
-        }
-        if (comment.includes("活用") || comment.includes("不定詞") || meaning.includes("ばかり") || meaning.includes("つもり")) {
-            return "動詞の活用";
-        }
-
-        // 4. デフォルト（基本は文法扱い）
-        return "前置詞・文法";
+    // 読み上げ用の冠詞を判定する関数
+    function getDefArticle(word, gender) {
+        const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ù'];
+        if (vowels.includes(word[0].toLowerCase())) return "l'";
+        return (gender === "男性") ? "le " : "la ";
     }
 
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById('level-tag').textContent = q.level + (currentMode === 'typing' ? ' Typing' : '');
+        document.getElementById('level-tag').textContent = q.level;
         document.getElementById('current-count').textContent = currentIndex + 1;
         document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
         document.getElementById('meaning-display').textContent = q.meaning;
@@ -320,12 +197,12 @@
             choicesDiv.style.display = 'grid';
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
-            const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c);
+            const choices = q.type === 'gender' ? ["男性 (le)", "女性 (la)"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c);
             choices.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = 'menu-btn';
                 btn.textContent = c;
-                btn.onclick = () => check(c);
+                btn.onclick = () => check(c.split(" ")[0]); // "男性 (le)" の "男性" だけを渡す
                 choicesDiv.appendChild(btn);
             });
         } else {
@@ -333,6 +210,7 @@
             typingDiv.style.display = 'block';
             input.style.display = 'block';
             input.value = ""; input.disabled = false;
+            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
             setTimeout(() => input.focus(), 100);
         }
     }
@@ -348,21 +226,39 @@
         const q = currentQuestions[currentIndex];
         let input = userAns.toLowerCase().trim();
         let correctAns = q.answer.toLowerCase();
-        let isCorrect = (input === correctAns);
+        let isCorrect = false;
 
-        if (currentMode === 'typing' && q.type === 'gender') {
-            if ((correctAns === "男性" && input === "un") || (correctAns === "女性" && input === "une") || input === correctAns) isCorrect = true;
+        const defArt = getDefArticle(q.word || "", q.answer).trim();
+
+        if (q.type === 'gender') {
+            // タイピングの場合の判定
+            if (currentMode === 'typing') {
+                if (input === defArt || input === defArt.replace("'","") || input === q.answer) isCorrect = true;
+            } else {
+                if (userAns === q.answer) isCorrect = true;
+            }
+        } else {
+            isCorrect = (input === correctAns);
         }
 
         saveResult(getCategory(q), isCorrect);
 
         const fb = document.getElementById('feedback');
-        fb.textContent = isCorrect ? "Excellent !" : "正解 : " + (q.type === 'gender' ? (q.answer === "男性" ? "un" : "une") : q.answer);
+        let displayAns = q.answer;
+        if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
+        
+        fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
         fb.style.color = isCorrect ? "var(--success)" : "var(--accent)";
         if (isCorrect) score++;
 
-        // 音声合成
-        let textToSpeak = q.type === 'gender' ? (q.answer === "男性" ? "un " : "une ") + q.word : q.word_or_question.replace("(   )", q.answer);
+        // --- 読み上げロジックの修正 ---
+        let textToSpeak = "";
+        if (q.type === 'gender') {
+            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
+        } else {
+            // カッコ (   ) を正解の単語で置換。正規表現でスペースの数に関わらず対応
+            textToSpeak = q.word_or_question.replace(/\(\s*\)/, q.answer);
+        }
         speakFrench(textToSpeak);
 
         document.querySelector('#commentary-box span').textContent = q.comment || "Pas de commentaire.";
