@@ -77,7 +77,7 @@
   { "level": "5級", "type": "cloze", "category": "熟語・表現", "word_or_question": "Je vous en (   ).", "meaning": "どういたしまして（丁寧に）。", "choice1": "prie", "choice2": "mercie", "choice3": "dis", "choice4": "salue", "answer": "prie", "comment": "Je vous en prie. は「どういたしまして」の丁寧な表現です。" },
   { "level": "5級", "type": "cloze", "category": "熟語・表現", "word_or_question": "Ça (   ) ?", "meaning": "元気？", "choice1": "va", "choice2": "est", "choice3": "fait", "choice4": "as", "answer": "va", "comment": "親しい間柄での挨拶 Ça va? です。" },
   { "level": "5級", "type": "cloze", "category": "熟語・表現", "word_or_question": "À (   ) !", "meaning": "また明日！", "choice1": "demain", "choice2": "soir", "choice3": "plus", "choice4": "bientôt", "answer": "demain", "comment": "「明日」を意味する demain を使った別れの挨拶です。" },
-  { "level": "5級", "type": "cloze", "category": "熟語・表現", "word_or_question": "(   ) s'appelle Marie.", "meaning": "彼女の名前はマリーです。", "choice1": "Elle", "choice2": "Il", "choice3": "Je", "choice4": "Tu", "answer": "Elle", "comment": "Marieは女性の名前なので、主語は Elle になります。" }
+  { "level": "5級", "type": "cloze", "category": "熟語・表現", "word_or_question": "(   ) s'appelle Marie.", "meaning": "彼女の名前はマリーです。", "choice1": "Elle", "choice2": "Il", "choice3": "Je", "choice4": "Tu", "answer": "Elle", "comment": "Marieは女性の名前なので、主語は Elle になります。" },
 
   
   { "level": "4級", "type": "gender", "category": "名詞の性", "word": "Musée", "meaning": "美術館", "answer": "男性", "comment": "-ée で終わる単語は女性名詞が多いですが、musée は例外の男性名詞です。" },
@@ -151,7 +151,7 @@
   { "level": "4級", "type": "cloze", "category": "前置詞・文法", "word_or_question": "Elle est (   ) France.", "meaning": "彼女はフランスにいます。", "choice1": "en", "choice2": "à", "choice3": "au", "choice4": "dans", "answer": "en", "comment": "女性国名の前には en を使います。" },
   { "level": "4級", "type": "cloze", "category": "動詞の活用", "word_or_question": "Nous (   ) fatigués.", "meaning": "私たちは疲れています。", "choice1": "sommes", "choice2": "êtes", "choice3": "sont", "choice4": "suis", "answer": "sommes", "comment": "être動詞の1人称複数活用です。" },
   { "level": "4級", "type": "cloze", "category": "前置詞・文法", "word_or_question": "Regarde (   ) oiseau.", "meaning": "あの鳥を見て。", "choice1": "cet", "choice2": "ce", "choice3": "cette", "choice4": "ces", "answer": "cet", "comment": "母音で始まる男性名詞の前の指示形容詞は cet です。" },
-  { "level": "4級", "type": "gender", "category": "名詞の性", "word": "Hôtel", "meaning": "ホテル", "answer": "男性", "comment": "un hôtel / l'hôtel です。男性名詞です。" }
+  { "level": "4級", "type": "gender", "category": "名詞の性", "word": "Hôtel", "meaning": "ホテル", "answer": "男性", "comment": "un hôtel / l'hôtel です。男性名詞です。" },
 
   
   { "level": "3級", "type": "gender", "category": "名詞の性", "word": "Problème", "meaning": "問題", "answer": "男性", "comment": "-me で終わる単語は男性名詞になることが多いです。" },
@@ -222,7 +222,7 @@
   { "level": "3級", "type": "cloze", "category": "前置詞・文法", "word_or_question": "C'est le plus (   ) monument.", "meaning": "これは最も美しい記念碑だ。", "choice1": "beau", "choice2": "bel", "choice3": "belle", "choice4": "beaux", "answer": "beau", "comment": "男性単数名詞 monument を修飾する最上級です。" },
   { "level": "3級", "type": "cloze", "category": "前置詞・文法", "word_or_question": "Je voudrais (   ) information.", "meaning": "情報が欲しいのですが。", "choice1": "une", "choice2": "un", "choice3": "des", "choice4": "le", "answer": "une", "comment": "information は女性名詞です。" },
   { "level": "3級", "type": "cloze", "category": "前置詞・文法", "word_or_question": "Il a (   ) de livres que moi.", "meaning": "彼は私と同じくらい本を持っている。", "choice1": "autant", "choice2": "aussi", "choice3": "plus", "choice4": "moins", "answer": "autant", "comment": "名詞の数量を比較する同等比較は autant de を使います。" },
-  { "level": "3級", "type": "gender", "category": "名詞の性", "word": "Héritage", "meaning": "遺産", "answer": "男性", "comment": "-age は男性名詞です。" }
+  { "level": "3級", "type": "gender", "category": "名詞の性", "word": "Héritage", "meaning": "遺産", "answer": "男性", "comment": "-age は男性名詞です。" },
   
 
   { "level": "2級", "type": "cloze", "category": "動詞の活用", "word_or_question": "Elle s'est (   ) les mains.", "meaning": "彼女は手を洗った。", "choice1": "lavé", "choice2": "lavée", "choice3": "lavés", "choice4": "lavées", "answer": "lavé", "comment": "直接目的語（les mains）が動詞の後ろにある場合、過去分詞は不変です。" },
