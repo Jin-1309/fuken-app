@@ -35,12 +35,16 @@
 
     <div id="menu-screen" class="screen">
         <h1>仏検対策ドリル</h1>
-        <div style="display:flex; flex-direction:column;">
-            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
-            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
-            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
-            <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全ミックス (4択)</button>
-            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング挑戦</button>
+        <div class="menu-grid">
+            <p>【4択モード】</p>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級レベル</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級レベル</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級レベル</button>
+            <button class="menu-btn" style="background:#fff3e0;" onclick="startQuiz('2級', 'choice')">2級レベル</button>
+            <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
+            <hr>
+            <p>【タイピングモード】</p>
+            <button class="menu-btn special-btn" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピングチャレンジ</button>
         </div>
     </div>
 
