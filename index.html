@@ -95,6 +95,8 @@
         }
         .btn-mix { background: var(--bleu); color: var(--blanc); font-weight: 600; margin-top: 8px; }
         .btn-mix:hover:not(:disabled) { background: #004488; color: var(--blanc); }
+        .btn-weak { border: 2px solid var(--rouge); color: var(--rouge); background: var(--blanc); font-weight: 600; margin-top: 8px; }
+        .btn-weak:hover:not(:disabled) { background: #FFF5F5; }
         .btn-typing { border: 1px dashed var(--text-light); background: transparent; color: var(--text-main); margin-top: 8px;}
 
         /* 分析エリア */
@@ -143,7 +145,7 @@
 
         .progress { margin-top: 2rem; color: var(--text-light); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.5px; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; transition: 0.2s; }
+        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; transition: 0.2s; text-decoration: underline; }
         .clear-btn:hover { color: var(--rouge); }
     </style>
 </head>
@@ -159,17 +161,17 @@
         <h1>仏検対策ドリル</h1>
         <div class="stats-card">
             <div id="stats-list"></div>
-            <button class="clear-btn" onclick="clearHistory()">学習履歴・未学習リストをリセット</button>
+            <button class="clear-btn" onclick="clearHistory()">すべての学習データをリセット</button>
         </div>
 
         <div class="section-title">📘 級別で学ぶ</div>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
-            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
-            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
-            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
-            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級</button>
-            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級</button>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級 (4択)</button>
         </div>
 
         <div class="section-title">📂 カテゴリー集中特訓 (全級)</div>
@@ -187,17 +189,18 @@
         </div>
     </div>
 
-    <!-- 出題範囲（未学習/すべて）選択画面 -->
+    <!-- 出題範囲（未学習/苦手/すべて）選択画面 -->
     <div id="range-select-screen" class="screen">
         <h1>出題範囲の選択</h1>
         <p style="color:var(--text-light); font-size:0.9rem; margin-bottom: 2rem;">どの問題に挑戦しますか？</p>
         
         <div style="display:flex; flex-direction:column; gap:12px;">
-            <button id="range-unlearned-btn" class="menu-btn btn-mix" onclick="confirmStartQuiz('unlearned')">未学習の問題 (...問)</button>
-            <button id="range-all-btn" class="menu-btn" onclick="confirmStartQuiz('all')">すべての問題 (...問)</button>
+            <button id="range-unlearned-btn" class="menu-btn btn-mix" onclick="confirmStartQuiz('unlearned')">🌱 未学習の問題 (...問)</button>
+            <button id="range-weak-btn" class="menu-btn btn-weak" onclick="confirmStartQuiz('weak')">🔥 苦手な問題 (...問)</button>
+            <button id="range-all-btn" class="menu-btn" onclick="confirmStartQuiz('all')">📚 すべての問題 (...問)</button>
         </div>
         
-        <button class="clear-btn" style="margin-top:2rem;" onclick="switchScreen('menu-screen')">← メニューに戻る</button>
+        <button class="clear-btn" style="margin-top:2rem; text-decoration:none;" onclick="switchScreen('menu-screen')">← メニューに戻る</button>
     </div>
 
     <!-- クイズ画面 -->
@@ -239,24 +242,30 @@
     let currentMode = 'choice';
     let lastSpokenText = "";
     
-    // クイズ設定を一時保存する変数
-    let quizConfig = { lvl: 'ALL', mode: 'choice', category: 'ALL' };
+    // クイズ設定
+    let quizConfig = { lvl: 'ALL', mode: 'choice', targetCategory: 'ALL' };
     
     let synth = window.speechSynthesis || null;
     let voices = [];
 
-    // 履歴と未学習データを読み込み
+    // 学習データの読み込み
     let history = {};
     let answeredQuestions = [];
+    let wrongQuestions = []; // 苦手（間違えた）問題リスト
+
     try {
         const savedHistory = localStorage.getItem('fuken_history');
         if (savedHistory) history = JSON.parse(savedHistory);
         
         const savedAnswered = localStorage.getItem('fuken_answered');
         if (savedAnswered) answeredQuestions = JSON.parse(savedAnswered);
+
+        const savedWrong = localStorage.getItem('fuken_wrong');
+        if (savedWrong) wrongQuestions = JSON.parse(savedWrong);
     } catch (e) {
         history = {};
         answeredQuestions = [];
+        wrongQuestions = [];
     }
 
     function initSpeech() {
@@ -315,11 +324,13 @@
     }
 
     function clearHistory() {
-        if (confirm("正答率の記録と「未学習」のリストをすべてリセットしますか？")) {
+        if (confirm("正答率、未学習リスト、苦手リストをすべてリセットしますか？")) {
             localStorage.removeItem('fuken_history'); 
             localStorage.removeItem('fuken_answered'); 
+            localStorage.removeItem('fuken_wrong'); 
             history = {}; 
             answeredQuestions = [];
+            wrongQuestions = [];
             renderStats();
         }
     }
@@ -348,12 +359,11 @@
         return "前置詞・文法";
     }
 
-    // 問題を一意に特定するためのIDを作る関数
     function getQuestionId(q) {
         return q.level + "_" + q.type + "_" + (q.word || q.word_or_question);
     }
 
-    // メニューから呼ばれる（出題範囲選択画面へ）
+    // メニューボタンから呼ばれる
     function startQuiz(lvl, mode, targetCategory = 'ALL') {
         initSpeech();
         quizConfig = { lvl, mode, targetCategory };
@@ -363,32 +373,41 @@
         if (targetCategory !== 'ALL') filtered = filtered.filter(q => getCategory(q) === targetCategory);
 
         const totalCount = filtered.length;
-        
         if (totalCount === 0) {
             return alert("該当する問題がまだ登録されていません。");
         }
 
-        // 未学習の問題を計算
-        const unlearnedFiltered = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q)));
-        const unlearnedCount = unlearnedFiltered.length;
+        // 各状態の問題数を計算
+        const unlearnedCount = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q))).length;
+        const weakCount = filtered.filter(q => wrongQuestions.includes(getQuestionId(q))).length;
 
-        // ボタンのテキストを更新
-        document.getElementById('range-all-btn').textContent = `すべての問題 (${totalCount}問から)`;
-        const unlearnBtn = document.getElementById('range-unlearned-btn');
-        unlearnBtn.textContent = `未学習の問題 (${unlearnedCount}問から)`;
+        // すべて
+        document.getElementById('range-all-btn').textContent = `📚 すべての問題 (${totalCount}問から)`;
         
-        // 未学習が0問ならボタンを押せなくする
+        // 未学習
+        const unlearnBtn = document.getElementById('range-unlearned-btn');
         if (unlearnedCount === 0) {
             unlearnBtn.disabled = true;
-            unlearnBtn.textContent = `未学習の問題 (すべて学習済み🎉)`;
+            unlearnBtn.textContent = `🌱 未学習の問題 (すべて学習済み🎉)`;
         } else {
             unlearnBtn.disabled = false;
+            unlearnBtn.textContent = `🌱 未学習の問題 (${unlearnedCount}問から)`;
+        }
+
+        // 苦手
+        const weakBtn = document.getElementById('range-weak-btn');
+        if (weakCount === 0) {
+            weakBtn.disabled = true;
+            weakBtn.textContent = `🔥 苦手な問題 (なし🎉)`;
+        } else {
+            weakBtn.disabled = false;
+            weakBtn.textContent = `🔥 苦手な問題 (${weakCount}問から)`;
         }
 
         switchScreen('range-select-screen');
     }
 
-    // 出題範囲（未学習 or すべて）を選択してスタート
+    // 出題範囲（未学習 / 苦手 / すべて）を選択してスタート
     function confirmStartQuiz(range) {
         currentMode = quizConfig.mode;
         let filtered = database;
@@ -398,9 +417,11 @@
 
         if (range === 'unlearned') {
             filtered = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q)));
+        } else if (range === 'weak') {
+            filtered = filtered.filter(q => wrongQuestions.includes(getQuestionId(q)));
         }
 
-        // 最大10問を選ぶ（残りが10問未満ならあるだけ）
+        // 最大10問をランダムに出題
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
         
         currentIndex = 0; score = 0;
@@ -457,7 +478,7 @@
     document.getElementById('typing-input').onkeypress = function(e) {
         if (e.key === 'Enter' && this.value.trim() !== "") {
             this.disabled = true;
-            this.blur(); 
+            this.blur(); // スマホのキーボードを閉じる
             check(this.value.trim());
         }
     };
@@ -485,11 +506,29 @@
             isCorrect = (input === correctAns);
         }
 
-        // 解答した問題を「学習済み」リストに追加
+        // --- 学習状態の記録（学習済み・苦手の管理） ---
         const qId = getQuestionId(q);
+        
+        // 1. 学習済みリストに追加
         if (!answeredQuestions.includes(qId)) {
             answeredQuestions.push(qId);
             localStorage.setItem('fuken_answered', JSON.stringify(answeredQuestions));
+        }
+
+        // 2. 苦手リストの更新
+        if (!isCorrect) {
+            // 間違えたら苦手リストに追加
+            if (!wrongQuestions.includes(qId)) {
+                wrongQuestions.push(qId);
+                localStorage.setItem('fuken_wrong', JSON.stringify(wrongQuestions));
+            }
+        } else {
+            // 正解したら苦手リストから削除（克服！）
+            const wIndex = wrongQuestions.indexOf(qId);
+            if (wIndex > -1) {
+                wrongQuestions.splice(wIndex, 1);
+                localStorage.setItem('fuken_wrong', JSON.stringify(wrongQuestions));
+            }
         }
 
         saveResult(getCategory(q), isCorrect);
