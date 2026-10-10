@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検対策</title>
+    <title>仏検対策ドリル</title>
     <style>
         /* 洗練されたフレンチモダン・カラー */
         :root { 
@@ -43,7 +43,7 @@
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 0.5px; }
+        h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 0.5px; }
 
         /* バッジ */
         .level-badge { 
@@ -99,6 +99,7 @@
             width: 90%; padding: 14px; font-size: 1.1rem; border: 1px solid var(--bleu); border-radius: 12px; 
             text-align: center; outline: none; color: var(--text-main); background: #fff; margin: 0 auto; display: block;
         }
+        #typing-input::placeholder { color: #A0AEC0; font-size: 0.9rem; }
 
         /* フィードバック・解説 */
         #feedback { margin-top: 1.5rem; font-weight: 600; font-size: 1.2rem; height: 1.5rem; }
@@ -143,17 +144,17 @@
         <h1>仏検対策ドリル</h1>
         <div class="stats-card">
             <div id="stats-list"></div>
-            <button class="clear-btn" onclick="clearHistory()">履歴リセット</button>
+            <button class="clear-btn" onclick="clearHistory()">学習履歴リセット</button>
         </div>
         <div class="menu-grid">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
-                <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
-                <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
-                <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
+                <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+                <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+                <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+                <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
             </div>
-            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング</button>
+            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス (4択)</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング挑戦</button>
         </div>
     </div>
 
@@ -182,7 +183,7 @@
         <h2 style="color: var(--text-light); font-size: 1rem; font-weight: 500;">Résultat</h2>
         <div style="font-size: 4.5rem; font-weight: 700; color: var(--bleu); margin: 1rem 0;" id="final-score">0</div>
         <p id="evaluation-msg" style="margin-bottom: 2rem; color: var(--text-light); font-size: 0.95rem;"></p>
-        <button class="menu-btn btn-mix" onclick="location.reload()">ダッシュボードへ</button>
+        <button class="menu-btn btn-mix" onclick="location.reload()">ダッシュボードへ戻る</button>
     </div>
 </div>
 
@@ -228,13 +229,15 @@
         if (!synth) return;
         try {
             synth.cancel();
-            const uttr = new SpeechSynthesisUtterance(text);
+            // 音声用テキストの正規化（アポストロフィ対応）
+            const cleanText = text.replace(/’/g, "'");
+            const uttr = new SpeechSynthesisUtterance(cleanText);
             uttr.lang = 'fr-FR';
             uttr.rate = 0.85;
             const frVoice = voices.find(v => v.lang.includes('fr'));
             if (frVoice) uttr.voice = frVoice;
             synth.speak(uttr);
-            lastSpokenText = text;
+            lastSpokenText = cleanText;
         } catch (e) { console.warn("Speech error:", e); }
     }
 
@@ -292,159 +295,7 @@
         currentMode = mode;
         let filtered = database;
 
-        // 【修正】レベルとモードによる絞り込みを明確化
+        // レベルによる絞り込み（タイピングは全問題出題に変更）
         if (lvl !== 'ALL') filtered = filtered.filter(q => q.level === lvl);
-        if (mode === 'typing') filtered = filtered.filter(q => q.type === 'gender'); // タイピングは名詞の性（le/la/l'）のみにする
 
-        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("該当する問題がありません");
-        currentIndex = 0; score = 0;
-        switchScreen('quiz-screen');
-        showQuestion();
-    }
-
-    function getCategory(q) {
-        if (q.category) return q.category;
-        if (q.type === 'gender') return "名詞の性";
-        return "前置詞・文法";
-    }
-
-    function getDefArticle(word, gender) {
-        if (!word || word.length === 0) return "";
-        const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ù'];
-        if (vowels.includes(word[0].toLowerCase())) return "l'";
-        return (gender === "男性") ? "le " : "la ";
-    }
-
-    function showQuestion() {
-        const q = currentQuestions[currentIndex];
-        document.getElementById('level-tag').textContent = q.level;
-        document.getElementById('current-count').textContent = currentIndex + 1;
-        document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
-        document.getElementById('meaning-display').textContent = q.meaning;
-        document.getElementById('feedback').textContent = "";
-        document.getElementById('feedback-area').style.display = "none";
-        
-        const choicesDiv = document.getElementById('choices-container');
-        const typingDiv = document.getElementById('typing-container');
-        const input = document.getElementById('typing-input');
-
-        if (currentMode === 'choice') {
-            choicesDiv.style.display = 'grid';
-            typingDiv.style.display = 'none';
-            choicesDiv.innerHTML = "";
-            const choices = q.type === 'gender' ? ["男性 (le)", "女性 (la)"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
-            
-            choices.forEach(c => {
-                const btn = document.createElement('button');
-                btn.className = 'menu-btn';
-                btn.textContent = c;
-                btn.onclick = () => {
-                    if (q.type === 'gender') {
-                        check(c.split(" ")[0]);
-                    } else {
-                        check(c);
-                    }
-                };
-                choicesDiv.appendChild(btn);
-            });
-        } else {
-            choicesDiv.style.display = 'none';
-            typingDiv.style.display = 'block';
-            
-            input.style.display = 'block'; 
-            input.value = ""; 
-            input.disabled = false;
-            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
-            setTimeout(() => input.focus(), 100);
-        }
-    }
-
-    document.getElementById('typing-input').onkeypress = function(e) {
-        if (e.key === 'Enter' && this.value.trim() !== "") {
-            this.disabled = true;
-            check(this.value.trim());
-        }
-    };
-
-    function check(userAns) {
-        const q = currentQuestions[currentIndex];
-        
-        // 【修正】スマホ等で入力されがちなスマートアポストロフィ(’)を通常のアポストロフィ(')に置換（正規化）
-        let input = String(userAns).toLowerCase().trim().replace(/’/g, "'");
-        let correctAns = String(q.answer).toLowerCase().replace(/’/g, "'");
-        
-        let isCorrect = false;
-        let defArt = "";
-
-        if (q.type === 'gender') {
-            defArt = getDefArticle(q.word, q.answer).trim();
-            if (currentMode === 'typing') {
-                if (input === defArt || input === defArt.replace("'","") || input === correctAns) isCorrect = true;
-            } else {
-                if (input === correctAns) isCorrect = true;
-            }
-        } else {
-            isCorrect = (input === correctAns);
-        }
-
-        saveResult(getCategory(q), isCorrect);
-
-        const fb = document.getElementById('feedback');
-        let displayAns = q.answer;
-        if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
-        
-        fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
-        fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
-        if (isCorrect) score++;
-
-        // 【修正】音声読み上げ用テキスト生成ロジック（複数箇所の穴埋めに対応）
-        let textToSpeak = "";
-        if (q.type === 'gender') {
-            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
-        } else {
-            textToSpeak = q.word_or_question;
-            const answers = q.answer.split('/').map(s => s.trim());
-            answers.forEach(ans => {
-                textToSpeak = textToSpeak.replace(/\(\s*\)/, ans);
-            });
-        }
-        speakFrench(textToSpeak);
-
-        document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
-        
-        // 【修正】最後の問題の場合はボタンのテキストを変更する
-        const nextBtn = document.getElementById('next-btn');
-        if (currentIndex === currentQuestions.length - 1) {
-            nextBtn.textContent = "Résultat (結果を見る)";
-        } else {
-            nextBtn.textContent = "Suivant (次へ)";
-        }
-        
-        document.getElementById('feedback-area').style.display = "block";
-        document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
-        
-        if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
-    }
-
-    function handleNext() {
-        currentIndex++;
-        if (currentIndex < currentQuestions.length) showQuestion();
-        else showResult();
-    }
-
-    function showResult() {
-        switchScreen('result-screen');
-        document.getElementById('final-score').textContent = score + " / 10";
-        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
-    }
-
-    function switchScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    loadData();
-</script>
-</body>
-</html>
+        cu
