@@ -18,8 +18,16 @@
         .meaning { color: #666; margin-bottom: 1rem; font-size: 0.9rem; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         #typing-input { width: 85%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 10px; text-align: center; }
-        #commentary-box { display: none; background: #fffde7; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; font-size: 0.9rem; color: #5d4037; line-height: 1.4; }
-        #next-btn { display: none; background: var(--primary); color: white; border: none; margin-top: 15px; }
+        
+        /* 解説・音声エリア */
+        #feedback-area { display: none; }
+        #commentary-box { background: #fffde7; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; font-size: 0.9rem; color: #5d4037; line-height: 1.4; position: relative; }
+        
+        /* 音声リピートボタン */
+        #audio-repeat-btn { background: #002395; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; margin: 10px auto; transition: transform 0.1s; }
+        #audio-repeat-btn:active { transform: scale(0.9); }
+
+        #next-btn { background: var(--primary); color: white; border: none; margin-top: 10px; }
         button:disabled { opacity: 0.6; }
         #feedback { margin-top: 1rem; font-weight: bold; font-size: 1.2rem; }
         .progress { margin-top: 1rem; color: #888; font-size: 0.8rem; }
@@ -38,7 +46,7 @@
             <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
             <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
             <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全ミックス (4択)</button>
-            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング挑戦</button>
+            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ タイピングに挑戦！</button>
         </div>
     </div>
 
@@ -46,13 +54,21 @@
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
+        
         <div id="choices-container" class="grid-choices"></div>
         <div id="typing-container" style="display:none;">
             <input type="text" id="typing-input" placeholder="入力..." autocomplete="off">
         </div>
+
         <div id="feedback"></div>
-        <div id="commentary-box"><strong>💡 解説:</strong> <span id="commentary-text"></span></div>
-        <button id="next-btn" class="menu-btn" onclick="handleNext()">次へ進む</button>
+
+        <!-- 回答後に出るエリア -->
+        <div id="feedback-area">
+            <button id="audio-repeat-btn" onclick="replayAudio()" title="音声を再生">🔊</button>
+            <div id="commentary-box"><strong>💡 解説:</strong> <span id="commentary-text"></span></div>
+            <button id="next-btn" class="menu-btn" onclick="handleNext()">次へ進む</button>
+        </div>
+
         <div class="progress">問題: <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
@@ -69,25 +85,20 @@
     let currentIndex = 0;
     let score = 0;
     let currentMode = 'choice';
+    let lastSpokenText = ""; // 音声リピート用に保存
 
-    // --- 音声読み上げ機能 ---
     function speakFrench(text) {
         if (!('speechSynthesis' in window)) return;
-        
-        // すでに喋っている場合は止める
         window.speechSynthesis.cancel();
-
         const uttr = new SpeechSynthesisUtterance(text);
-        uttr.lang = 'fr-FR'; // フランス語に設定
-        uttr.rate = 0.9;     // 少しゆっくりめ
-        uttr.pitch = 1.0;
-        
-        // ブラウザからフランス語の声を探す
-        const voices = window.speechSynthesis.getVoices();
-        const frVoice = voices.find(v => v.lang.startsWith('fr'));
-        if (frVoice) uttr.voice = frVoice;
-
+        uttr.lang = 'fr-FR';
+        uttr.rate = 0.9;
         window.speechSynthesis.speak(uttr);
+        lastSpokenText = text; // テキストを保存
+    }
+
+    function replayAudio() {
+        if (lastSpokenText) speakFrench(lastSpokenText);
     }
 
     async function loadData() {
@@ -115,8 +126,7 @@
         document.getElementById('current-count').textContent = currentIndex + 1;
         document.getElementById('total-count').textContent = currentQuestions.length;
         document.getElementById('feedback').textContent = "";
-        document.getElementById('commentary-box').style.display = "none";
-        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('feedback-area').style.display = "none";
         document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
         document.getElementById('meaning-display').textContent = q.meaning;
         
@@ -139,6 +149,7 @@
         } else {
             choicesDiv.style.display = 'none';
             typingDiv.style.display = 'block';
+            input.style.display = 'inline-block';
             input.value = ""; input.disabled = false; input.focus();
         }
     }
@@ -166,27 +177,25 @@
         fb.textContent = isCorrect ? "C'est bien ! 正解" : "残念... 正解は " + (q.type === 'gender' ? (q.answer === "男性" ? "un" : "une") : q.answer);
         fb.style.color = isCorrect ? "#4CAF50" : "#EF4135";
         
-        if (isCorrect) {
-            score++;
-            // --- 正解時に読み上げを実行 ---
-            let textToSpeak = "";
-            if (q.type === 'gender') {
-                // 性別問題なら冠詞をつけて読む
-                textToSpeak = (q.answer === "男性" ? "un " : "une ") + q.word;
-            } else {
-                // 文章問題ならカッコを正解で埋めて読む
-                textToSpeak = q.word_or_question.replace("(   )", q.answer);
-            }
-            speakFrench(textToSpeak);
-        }
+        if (isCorrect) score++;
 
-        if (q.comment) {
-            document.getElementById('commentary-text').textContent = q.comment;
-            document.getElementById('commentary-box').style.display = "block";
+        // --- 読み上げ用テキスト作成 ---
+        let textToSpeak = "";
+        if (q.type === 'gender') {
+            textToSpeak = (q.answer === "男性" ? "un " : "une ") + q.word;
+        } else {
+            textToSpeak = q.word_or_question.replace("(   )", q.answer);
         }
+        
+        // 合っていても間違えていても読み上げ
+        speakFrench(textToSpeak);
+
+        // 解説の表示
+        document.getElementById('commentary-text').textContent = q.comment || "解説はありません。";
+        document.getElementById('feedback-area').style.display = "block";
 
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
-        document.getElementById('next-btn').style.display = "block";
+        if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
     }
 
     function handleNext() {
