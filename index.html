@@ -88,13 +88,36 @@
     let lastSpokenText = ""; // 音声リピート用に保存
 
     function speakFrench(text) {
-        if (!('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
+        if (!('speechSynthesis' in window)) {
+            console.error("このブラウザは音声読み上げに対応していません。");
+            return;
+        }
+        
+        window.speechSynthesis.cancel(); // 進行中の音声を停止
+
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = 'fr-FR';
         uttr.rate = 0.9;
-        window.speechSynthesis.speak(uttr);
-        lastSpokenText = text; // テキストを保存
+
+        // 【修正ポイント】ブラウザに搭載されている声をリストアップ
+        let voices = window.speechSynthesis.getVoices();
+        
+        // もし声のリストが空なら、少し待って再取得（ブラウザの仕様対策）
+        if (voices.length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                voices = window.speechSynthesis.getVoices();
+                const frVoice = voices.find(v => v.lang.startsWith('fr'));
+                if (frVoice) uttr.voice = frVoice;
+                window.speechSynthesis.speak(uttr);
+            };
+        } else {
+            const frVoice = voices.find(v => v.lang.startsWith('fr'));
+            if (frVoice) uttr.voice = frVoice;
+            window.speechSynthesis.speak(uttr);
+        }
+        
+        lastSpokenText = text;
+
     }
 
     function replayAudio() {
