@@ -5,77 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仏検対策</title>
     <style>
-        :root { --primary: #002395; --accent: #EF4135; --bg: #f0f2f5; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        :root { --primary: #002395; --accent: #EF4135; --bg: #f0f2f5; --success: #4CAF50; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         #app-container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 95%; max-width: 450px; text-align: center; }
         .screen { display: none; }
         .screen.active { display: block; }
         h1 { color: var(--primary); font-size: 1.5rem; margin-bottom: 1rem; }
-        .level-badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 0.5rem; display: inline-block; }
-        .menu-btn { width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: bold; background: white; transition: 0.2s; }
-        .menu-btn:hover:not(:disabled) { border-color: var(--primary); background: #f0f4ff; }
-        .question-text { font-size: 1.4rem; font-weight: bold; margin: 1rem 0; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
-        .meaning { color: #666; margin-bottom: 1rem; font-size: 0.9rem; }
-        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        #typing-input { width: 85%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 10px; text-align: center; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .menu-btn { width: 100%; padding: 12px; margin-bottom: 8px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: bold; background: white; transition: 0.2s; }
+        .menu-btn:hover { border-color: var(--primary); background: #f0f4ff; }
         
-        /* 解説・音声エリア */
-        #feedback-area { display: none; }
-        #commentary-box { background: #fffde7; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; font-size: 0.9rem; color: #5d4037; line-height: 1.4; position: relative; }
-        
-        /* 音声リピートボタン */
-        #audio-repeat-btn { background: #002395; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; margin: 10px auto; transition: transform 0.1s; }
-        #audio-repeat-btn:active { transform: scale(0.9); }
+        /* 分析・履歴用スタイル */
+        .stats-container { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: left; }
+        .stat-row { margin-bottom: 10px; }
+        .stat-label { font-size: 0.85rem; color: #555; display: flex; justify-content: space-between; }
+        .bar-bg { background: #ddd; height: 8px; border-radius: 4px; margin-top: 4px; overflow: hidden; }
+        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s; }
+        .weak { background: var(--accent) !important; }
+        .strong { background: var(--success) !important; }
+        .clear-btn { font-size: 0.7rem; color: #888; background: none; border: none; text-decoration: underline; cursor: pointer; margin-top: 10px; }
 
-        #next-btn { background: var(--primary); color: white; border: none; margin-top: 10px; }
-        button:disabled { opacity: 0.6; }
-        #feedback { margin-top: 1rem; font-weight: bold; font-size: 1.2rem; }
-        .progress { margin-top: 1rem; color: #888; font-size: 0.8rem; }
+        /* クイズ画面共通 */
+        .question-text { font-size: 1.4rem; font-weight: bold; margin: 1rem 0; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
+        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        #feedback-area { display: none; margin-top: 15px; }
+        #commentary-box { background: #fffde7; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; text-align: left; font-size: 0.85rem; line-height: 1.4; }
+        #audio-repeat-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; margin: 10px auto; display: block; }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    <div id="loading-screen" class="screen active"><h1>Loading...</h1></div>
+    <div id="loading-screen" class="screen active"><h1>読み込み中...</h1></div>
 
+    <!-- メニュー・分析画面 -->
     <div id="menu-screen" class="screen">
-        <h1>仏検対策ドリル</h1>
-        <div style="display:flex; flex-direction:column;">
+        <h1>🇫🇷 仏検学習ダッシュボード</h1>
+        
+        <div class="stats-container">
+            <strong>📊 弱点分析（正解率）</strong>
+            <div id="stats-list"></div>
+            <button class="clear-btn" onclick="clearHistory()">学習履歴をリセットする</button>
+        </div>
+
+        <div class="menu-grid">
             <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
             <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
             <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
             <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
-            <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全ミックス (4択)</button>
-            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ タイピングに挑戦！</button>
+            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング挑戦</button>
         </div>
     </div>
 
+    <!-- クイズ画面 -->
     <div id="quiz-screen" class="screen">
-        <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
-        <div id="meaning-display" class="meaning"></div>
-        
         <div id="choices-container" class="grid-choices"></div>
         <div id="typing-container" style="display:none;">
-            <input type="text" id="typing-input" placeholder="入力..." autocomplete="off">
+            <input type="text" id="typing-input" style="width:80%; padding:10px; border-radius:10px; border:1px solid #ccc; text-align:center;" autocomplete="off">
         </div>
-
-        <div id="feedback"></div>
-
-        <!-- 回答後に出るエリア -->
+        <div id="feedback" style="margin-top:10px; font-weight:bold;"></div>
         <div id="feedback-area">
-            <button id="audio-repeat-btn" onclick="replayAudio()" title="音声を再生">🔊</button>
-            <div id="commentary-box"><strong>💡 解説:</strong> <span id="commentary-text"></span></div>
-            <button id="next-btn" class="menu-btn" onclick="handleNext()">次へ進む</button>
+            <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
+            <div id="commentary-box"><span id="commentary-text"></span></div>
+            <button class="menu-btn" style="margin-top:10px; background:var(--primary); color:white;" onclick="handleNext()">次へ進む</button>
         </div>
-
-        <div class="progress">問題: <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
+    <!-- 結果画面 -->
     <div id="result-screen" class="screen">
-        <h2>結果発表</h2>
-        <div style="font-size: 4rem; font-weight: bold; color: var(--primary);" id="final-score">0</div>
-        <button class="menu-btn" onclick="location.reload()">メニューに戻る</button>
+        <h2>今回の結果</h2>
+        <div style="font-size: 3rem; font-weight: bold;" id="final-score">0</div>
+        <button class="menu-btn" onclick="location.reload()">ダッシュボードに戻る</button>
     </div>
 </div>
 
@@ -85,49 +86,66 @@
     let currentIndex = 0;
     let score = 0;
     let currentMode = 'choice';
-    let lastSpokenText = ""; // 音声リピート用に保存
+    let lastSpokenText = "";
 
+    // 学習履歴データ
+    let history = JSON.parse(localStorage.getItem('fuken_history')) || {};
+
+    // 読み上げ機能
     function speakFrench(text) {
-        if (!('speechSynthesis' in window)) {
-            console.error("このブラウザは音声読み上げに対応していません。");
-            return;
-        }
-        
-        window.speechSynthesis.cancel(); // 進行中の音声を停止
-
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = 'fr-FR';
         uttr.rate = 0.9;
-
-        // 【修正ポイント】ブラウザに搭載されている声をリストアップ
-        let voices = window.speechSynthesis.getVoices();
-        
-        // もし声のリストが空なら、少し待って再取得（ブラウザの仕様対策）
-        if (voices.length === 0) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                voices = window.speechSynthesis.getVoices();
-                const frVoice = voices.find(v => v.lang.startsWith('fr'));
-                if (frVoice) uttr.voice = frVoice;
-                window.speechSynthesis.speak(uttr);
-            };
-        } else {
-            const frVoice = voices.find(v => v.lang.startsWith('fr'));
-            if (frVoice) uttr.voice = frVoice;
-            window.speechSynthesis.speak(uttr);
-        }
-        
+        window.speechSynthesis.speak(uttr);
         lastSpokenText = text;
-
     }
 
-    function replayAudio() {
-        if (lastSpokenText) speakFrench(lastSpokenText);
+    function replayAudio() { if (lastSpokenText) speakFrench(lastSpokenText); }
+
+    // 履歴の更新
+    function saveResult(category, isCorrect) {
+        if (!history[category]) history[category] = { correct: 0, total: 0 };
+        history[category].total += 1;
+        if (isCorrect) history[category].correct += 1;
+        localStorage.setItem('fuken_history', JSON.stringify(history));
     }
 
+    // 分析画面の表示
+    function renderStats() {
+        const list = document.getElementById('stats-list');
+        list.innerHTML = "";
+        const categories = ["名詞の性", "動詞の活用", "前置詞・文法", "熟語・表現"];
+        
+        categories.forEach(cat => {
+            const data = history[cat] || { correct: 0, total: 0 };
+            const percent = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+            let colorClass = percent < 50 && data.total > 0 ? "weak" : (percent > 80 ? "strong" : "");
+            
+            list.innerHTML += `
+                <div class="stat-row">
+                    <div class="stat-label"><span>${cat}</span><span>${percent}% (${data.correct}/${data.total})</span></div>
+                    <div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div>
+                </div>
+            `;
+        });
+    }
+
+    function clearHistory() {
+        if (confirm("学習履歴をすべて削除しますか？")) {
+            localStorage.removeItem('fuken_history');
+            history = {};
+            renderStats();
+        }
+    }
+
+    // データ読み込み
     async function loadData() {
         try {
             const response = await fetch('questions.json?t=' + Date.now());
             database = await response.json();
+            renderStats();
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('menu-screen').classList.add('active');
         } catch (e) { console.error("Load error"); }
@@ -137,21 +155,25 @@
         currentMode = mode;
         let filtered = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("問題がありません");
         currentIndex = 0; score = 0;
         switchScreen('quiz-screen');
         showQuestion();
     }
 
+    // 自動カテゴリー判定
+    function getCategory(q) {
+        if (q.category) return q.category; // JSONにあればそれを使う
+        if (q.type === 'gender') return "名詞の性";
+        if (q.word_or_question.includes('de') || q.word_or_question.includes('à')) return "前置詞・文法";
+        if (q.meaning.includes('ばかり') || q.meaning.includes('つもり')) return "動詞の活用";
+        return "熟語・表現";
+    }
+
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById('level-tag').textContent = q.level;
-        document.getElementById('current-count').textContent = currentIndex + 1;
-        document.getElementById('total-count').textContent = currentQuestions.length;
         document.getElementById('feedback').textContent = "";
         document.getElementById('feedback-area').style.display = "none";
         document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
-        document.getElementById('meaning-display').textContent = q.meaning;
         
         const choicesDiv = document.getElementById('choices-container');
         const typingDiv = document.getElementById('typing-container');
@@ -172,53 +194,37 @@
         } else {
             choicesDiv.style.display = 'none';
             typingDiv.style.display = 'block';
-            input.style.display = 'inline-block';
             input.value = ""; input.disabled = false; input.focus();
         }
     }
 
     document.getElementById('typing-input').onkeypress = function(e) {
-        if (e.key === 'Enter' && this.value.trim() !== "") {
-            this.disabled = true;
-            check(this.value.trim());
-        }
+        if (e.key === 'Enter') { this.disabled = true; check(this.value.trim()); }
     };
 
     function check(userAns) {
         const q = currentQuestions[currentIndex];
-        let correctAns = q.answer.toLowerCase();
         let input = userAns.toLowerCase();
-        let isCorrect = false;
+        let correctAns = q.answer.toLowerCase();
+        let isCorrect = (input === correctAns);
 
         if (currentMode === 'typing' && q.type === 'gender') {
             if ((correctAns === "男性" && input === "un") || (correctAns === "女性" && input === "une") || input === correctAns) isCorrect = true;
-        } else {
-            isCorrect = (input === correctAns);
         }
+
+        // 履歴の保存
+        saveResult(getCategory(q), isCorrect);
 
         const fb = document.getElementById('feedback');
-        fb.textContent = isCorrect ? "C'est bien ! 正解" : "残念... 正解は " + (q.type === 'gender' ? (q.answer === "男性" ? "un" : "une") : q.answer);
-        fb.style.color = isCorrect ? "#4CAF50" : "#EF4135";
-        
+        fb.textContent = isCorrect ? "C'est bien !" : "正解: " + (q.type === 'gender' ? (q.answer === "男性" ? "un" : "une") : q.answer);
+        fb.style.color = isCorrect ? "var(--success)" : "var(--accent)";
         if (isCorrect) score++;
 
-        // --- 読み上げ用テキスト作成 ---
-        let textToSpeak = "";
-        if (q.type === 'gender') {
-            textToSpeak = (q.answer === "男性" ? "un " : "une ") + q.word;
-        } else {
-            textToSpeak = q.word_or_question.replace("(   )", q.answer);
-        }
-        
-        // 合っていても間違えていても読み上げ
-        speakFrench(textToSpeak);
+        speakFrench(q.type === 'gender' ? (q.answer === "男性" ? "un " : "une ") + q.word : q.word_or_question.replace("(   )", q.answer));
 
-        // 解説の表示
         document.getElementById('commentary-text').textContent = q.comment || "解説はありません。";
         document.getElementById('feedback-area').style.display = "block";
-
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
-        if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
     }
 
     function handleNext() {
