@@ -47,6 +47,11 @@
   { "level": "5級", "type": "cloze", "word_or_question": "Je (   ) à Paris.", "meaning": "私はパリへ行きます。", "choice1": "vais", "choice2": "vas", "choice3": "va", "choice4": "vont", "answer": "vais", "comment": "動詞 aller（行く）の1人称単数活用です。不規則活用なので Je vais は丸暗記しましょう。" },
   { "level": "5級", "type": "cloze", "word_or_question": "C'est (   ) stylo.", "meaning": "これは1本のペンです。", "choice1": "un", "choice2": "une", "choice3": "des", "choice4": "le", "answer": "un", "comment": "stylo（ペン）は男性名詞なので、不定冠詞は un になります。" },
   { "level": "5級", "type": "cloze", "word_or_question": "Bonjour, (   ) allez-vous ?", "meaning": "こんにちは、お元気ですか？", "choice1": "comment", "choice2": "quel", "choice3": "qui", "choice4": "où", "answer": "comment", "comment": "状態を尋ねる「いかに」という意味の Comment を使った定番の挨拶です。" },
+  { "level": "5級", "type": "gender", "word": "Café", "meaning": "コーヒー", "answer": "男性", "comment": "飲み物の名前です。le café と覚えましょう。フランスのカフェ文化の基本単語です。" },
+  { "level": "5級", "type": "gender", "word": "Glace", "meaning": "アイスクリーム", "answer": "女性", "comment": "デザートの「アイス」や「氷」を指します。la glace と音で覚えましょう。" },
+  { "level": "5級", "type": "cloze", "word_or_question": "Il (   ) froid.", "meaning": "（天気が）寒いです。", "choice1": "fait", "choice2": "est", "choice3": "a", "choice4": "va", "answer": "fait", "comment": "天候を言う時は非人称の主語 Il と動詞 faire を使います。Il fait froid でセットです。" },
+  { "level": "5級", "type": "cloze", "word_or_question": "Je mange (   ) salade.", "meaning": "私はサラダを食べます。", "choice1": "de la", "choice2": "du", "choice3": "des", "choice4": "le", "answer": "de la", "comment": "salade は女性名詞です。数えられない量として扱うため、女性形の部分冠詞 de la を使います。" },
+  { "level": "5級", "type": "cloze", "word_or_question": "C'est (   ) amie.", "meaning": "彼女は（私の）女友達です。", "choice1": "mon", "choice2": "ma", "choice3": "mes", "choice4": "ta", "answer": "mon", "comment": "amie は女性名詞ですが、母音で始まるため ma amie ではなく、発音の都合で男性形の mon を使います。" },
 
   
   { "level": "4級", "type": "gender", "word": "Musée", "meaning": "美術館", "answer": "男性", "comment": "フランス語の -ée で終わる単語は女性名詞が多いですが、musée（美術館）や lycée（高校）は数少ない例外の男性名詞です。試験によく狙われます。" },
@@ -95,6 +100,11 @@
   { "level": "4級", "type": "cloze", "word_or_question": "Elle est (   ) intelligente que lui.", "meaning": "彼女は彼よりも賢い。", "choice1": "plus", "choice2": "très", "choice3": "beaucoup", "choice4": "bien", "answer": "plus", "comment": "plus + 形容詞 + que で比較級（〜より〜だ）を表します。" },
   { "level": "4級", "type": "cloze", "word_or_question": "Je vais (   ) cinéma.", "meaning": "私は映画館に行きます。", "choice1": "au", "choice2": "à la", "choice3": "en", "choice4": "dans", "answer": "au", "comment": "cinéma は男性名詞です。à + le が合体（縮約）して au になります。" },
   { "level": "4級", "type": "cloze", "word_or_question": "Répondez-(   ) !", "meaning": "私に答えなさい！", "choice1": "moi", "choice2": "me", "choice3": "je", "choice4": "ma", "answer": "moi", "comment": "肯定命令文で動詞の後ろに置く場合、1人称単数の代名詞は moi を使います。" },
+  { "level": "4級", "type": "gender", "word": "Cadeau", "meaning": "贈り物", "answer": "男性", "comment": "語尾が -eau の単語は男性名詞です。un cadeau / le cadeau とセットで覚えましょう。" },
+  { "level": "4級", "type": "gender", "word": "Saison", "meaning": "季節", "answer": "女性", "comment": "語尾が -son の単語は女性名詞が多いです。la saison と覚えましょう。" },
+  { "level": "4級", "type": "cloze", "word_or_question": "Elle (   ) les cheveux longs.", "meaning": "彼女は髪が長いです。", "choice1": "a", "choice2": "est", "choice3": "fait", "choice4": "va", "answer": "a", "comment": "身体的特徴（目や髪の色・長さなど）を説明する時は、動詞 avoir を使います。" },
+  { "level": "4級", "type": "cloze", "word_or_question": "Il pleut (   ).", "meaning": "とても雨が降っています。", "choice1": "beaucoup", "choice2": "très", "choice3": "bien", "choice4": "souvent", "answer": "beaucoup", "comment": "動詞（pleuvoir）を修飾して「たくさん」と言う時は beaucoup を使います。très は形容詞の修飾用です。" },
+  { "level": "4級", "type": "cloze", "word_or_question": "Je vais (   ) dentiste.", "meaning": "私は歯医者に行きます。", "choice1": "chez le", "choice2": "au", "choice3": "à la", "choice4": "en", "answer": "chez le", "comment": "「（職業・人）のところへ行く」時は、前置詞 à ではなく chez を使います。" },
 
   
   { "level": "3級", "type": "gender", "word": "Problème", "meaning": "問題", "answer": "男性", "comment": "語尾が -me で終わるギリシャ語由来の単語（problème, système, programmeなど）は、多くの場合男性名詞になります。" },
@@ -130,7 +140,7 @@
   { "level": "3級", "type": "cloze", "word_or_question": "Grâce (   ) toi.", "meaning": "君のおかげで。", "choice1": "à", "choice2": "de", "choice3": "pour", "choice4": "sur", "answer": "à", "comment": "Grâce à (人/事) で「〜のおかげで（良い結果）」を表します。悪い原因のときは à cause de を使います。" },
   { "level": "3級", "type": "cloze", "word_or_question": "À (   ) de.", "meaning": "〜の理由で。", "choice1": "cause", "choice2": "raison", "choice3": "grâce", "choice4": "suite", "answer": "cause", "comment": "À cause de (人/事) で「〜のせいで、〜のせいで（悪い結果）」を表します。" },
   { "level": "3級", "type": "cloze", "word_or_question": "En (   ) que.", "meaning": "〜として。", "choice1": "tant", "choice2": "guise", "choice3": "lieu", "choice4": "effet", "answer": "tant", "comment": "En tant que + 名詞 で「〜として（資格や立場）」を表します。En tant qu'étudiant（学生として）など。" },
-   { "level": "3級", "type": "gender", "word": "Vérité", "meaning": "真実", "answer": "女性", "comment": "語尾が -té で終わる抽象名詞は、フランス語では圧倒的に女性名詞が多いです。" },
+  { "level": "3級", "type": "gender", "word": "Vérité", "meaning": "真実", "answer": "女性", "comment": "語尾が -té で終わる抽象名詞は、フランス語では圧倒的に女性名詞が多いです。" },
   { "level": "3級", "type": "gender", "word": "Courage", "meaning": "勇気", "answer": "男性", "comment": "語尾が -age の単語は基本男性ですが、courage（勇気）もその一つです。重要な3級単語です。" },
   { "level": "3級", "type": "gender", "word": "Opinion", "meaning": "意見", "answer": "女性", "comment": "語尾が -ion で終わる名詞（特に -tion, -sion）は、ほぼすべて女性名詞です。" },
   { "level": "3級", "type": "gender", "word": "Bonheur", "meaning": "幸福", "answer": "男性", "comment": "語尾が -eur の抽象名詞は男性名詞が多いです。反対語の malheur（不幸）も男性名詞です。" },
@@ -143,6 +153,11 @@
   { "level": "3級", "type": "cloze", "word_or_question": "Il (   ) de partir.", "meaning": "出発する時間だ。", "choice1": "est temps", "choice2": "fait temps", "choice3": "a temps", "choice4": "va temps", "answer": "est temps", "comment": "「Il est temps de + 不定詞」で「〜する時間だ」という定型表現です。" },
   { "level": "3級", "type": "cloze", "word_or_question": "Elle est (   ) à Paris.", "meaning": "彼女はパリへ行った（複合過去）。", "choice1": "allée", "choice2": "allé", "choice3": "allés", "choice4": "allées", "answer": "allée", "comment": "助動詞に être を使う複合過去では、過去分詞を主語（Elle: 女性単数）に一致させます。" },
   { "level": "3級", "type": "cloze", "word_or_question": "J'en ai (   ).", "meaning": "私はそれを3つ持っています。", "choice1": "trois", "choice2": "les trois", "choice3": "de trois", "choice4": "en trois", "answer": "trois", "comment": "数量を表す言葉がある場合、中性代名詞 en とセットで使いますが、数量詞（trois）は最後に置きます。" },
+  { "level": "3級", "type": "gender", "word": "Liberté", "meaning": "自由", "answer": "女性", "comment": "抽象名詞 -té は女性名詞です。フランスの国家標語 Liberté, Égalité, Fraternité はすべて女性名詞です。" },
+  { "level": "3級", "type": "gender", "word": "Voyage", "meaning": "旅行", "answer": "男性", "comment": "語尾が -age の単語は男性名詞の代表格です。Bon voyage!（良い旅を！）というフレーズで覚えましょう。" },
+  { "level": "3級", "type": "cloze", "word_or_question": "Il est (   ) de sortir.", "meaning": "外出するのは危険です。", "choice1": "dangereux", "choice2": "danger", "choice3": "dangeureuse", "choice4": "dangereusement", "answer": "dangereux", "comment": "Il est + 形容詞 + de ... の非人称構文です。主語 Il に合わせて形容詞の男性形を選びます。" },
+  { "level": "3級", "type": "cloze", "word_or_question": "Je ne (   ) pas qu'il vienne.", "meaning": "彼が来るとは思いません。", "choice1": "crois", "choice2": "pense", "choice3": "sais", "choice4": "veux", "answer": "crois", "comment": "思考の動詞を否定にすると、後ろの節（qu'il vienne）が接続法になります。croire や penser が典型です。" },
+  { "level": "3級", "type": "cloze", "word_or_question": "C'est (   ) qui a raison.", "meaning": "正しいのは私だ。", "choice1": "moi", "choice2": "je", "choice3": "me", "choice4": "mon", "answer": "moi", "comment": "強調構文 C'est ... qui の ... には代名詞の強勢形（moi, toi, lui等）が入ります。" },
 
   
   { "level": "2級", "type": "cloze", "word_or_question": "Elle s'est (   ) les mains.", "meaning": "彼女は手を洗った。", "choice1": "lavé", "choice2": "lavée", "choice3": "lavés", "choice4": "lavées", "answer": "lavé", "comment": "代名動詞の複合過去において、身体部位などの直接目的語が動詞の後ろにある場合、過去分詞は主語に一致させず不変（lavé）となります。" },
@@ -294,5 +309,16 @@
   { "level": "2級", "type": "cloze", "word_or_question": "Il est (   ) de partir maintenant.", "meaning": "今出発するのが賢明だ。", "choice1": "sage", "choice2": "fou", "choice3": "vrai", "choice4": "possible", "answer": "sage", "comment": "être sage de + 不定詞 で「〜するのが賢明だ、賢い選択だ」という意味になります。" },
   { "level": "2級", "type": "cloze", "word_or_question": "Elle a (   ) à mon invitation.", "meaning": "彼女は私の招待に応じた。", "choice1": "répondu", "choice2": "reçu", "choice3": "accepté", "choice4": "pris", "answer": "répondu", "comment": "répondre à une invitation で「招待に返事をする（応じる）」という意味になります。" },
   { "level": "2級", "type": "cloze", "word_or_question": "Il s'est (   ) de son retard.", "meaning": "彼は遅刻を詫びた。", "choice1": "excusé", "choice2": "plaint", "choice3": "occupé", "choice4": "souvenu", "answer": "excusé", "comment": "s'excuser de 〜 で「〜のことで謝罪する、言い訳をする」という意味の代名動詞です。" },
-  { "level": "2級", "type": "cloze", "word_or_question": "C'est (   ) de lui.", "meaning": "それはいかにも彼らしい。", "choice1": "tout à fait", "choice2": "bien", "choice3": "propre", "choice4": "particulier", "answer": "tout à fait", "comment": "C'est tout à fait lui. で「まさに彼そのものだ、いかにも彼らしい」という人柄を強調する表現です。" }
+  { "level": "2級", "type": "cloze", "word_or_question": "C'est (   ) de lui.", "meaning": "それはいかにも彼らしい。", "choice1": "tout à fait", "choice2": "bien", "choice3": "propre", "choice4": "particulier", "answer": "tout à fait", "comment": "C'est tout à fait lui. で「まさに彼そのものだ、いかにも彼らしい」という人柄を強調する表現です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Elle s'est (   ) compte de son erreur.", "meaning": "彼女は自分の間違いに気づいた。", "choice1": "rendu", "choice2": "rendue", "choice3": "rendus", "choice4": "rendues", "answer": "rendu", "comment": "【語彙・慣用句】se rendre compte de 〜（気づく）の過去分詞 rendu は、後ろに目的語があっても常に不変です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Il a fini par (   ) la vérité.", "meaning": "彼はついに真実を告白した。", "choice1": "avouer", "choice2": "dire", "choice3": "parler", "choice4": "raconter", "answer": "avouer", "comment": "【語彙】「白状する、認める」という意味の avouer は2級レベルで必須の語彙です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Je n'y suis (   ) rien.", "meaning": "私はそれに関係ありません（私のせいではありません）。", "choice1": "pour", "choice2": "dans", "choice3": "avec", "choice4": "sur", "answer": "pour", "comment": "【熟語】n'y être pour rien で「全く関与していない、責任がない」という非常にフランス語らしい表現です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "C'est (   ) de le dire.", "meaning": "まさにその通りだ（おっしゃる通りです）。", "choice1": "le cas", "choice2": "vrai", "choice3": "bien", "choice4": "juste", "answer": "le cas", "comment": "【慣用表現】C'est le cas de le dire. で「まさにその通り、言葉通りだ」という意味の決まり文句です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Il a (   ) de la chance.", "meaning": "彼は運を使い果たした。", "choice1": "épuisé", "choice2": "manqué", "choice3": "perdu", "choice4": "fini", "answer": "épuisé", "comment": "【語彙】「使い果たす、疲れさせる」という意味の épuiser。2級では単なる形容詞以外の動詞力が問われます。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Il m'a (   ) de ses nouvelles.", "meaning": "彼は私に近況を知らせてくれた。", "choice1": "donné", "choice2": "fait", "choice3": "dit", "choice4": "envoyé", "answer": "donné", "comment": "【慣用句】donner de ses nouvelles で「近況を知らせる、便りをする」となります。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Rien ne (   ) de courir.", "meaning": "急いでも無駄だ（あせっても始まらない）。", "choice1": "sert", "choice2": "vaut", "choice3": "fait", "choice4": "peut", "answer": "sert", "comment": "【ことわざ的表現】Rien ne sert de + 不定詞 で「〜しても無駄だ」というラ・フォンテーヌの寓話由来の有名な表現です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Elle est (   ) à ses études.", "meaning": "彼女は勉強に専念している。", "choice1": "vouée", "choice2": "donnée", "choice3": "faite", "choice4": "mise", "answer": "vouée", "comment": "【語彙】être voué à 〜 で「〜に捧げられている、専念している」という、やや硬い表現です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Au (   ) de sa carrière.", "meaning": "彼のキャリアの絶頂期に。", "choice1": "sommet", "choice2": "haut", "choice3": "bout", "choice4": "plein", "answer": "sommet", "comment": "【語彙・比喩】sommet（山頂）を使ってキャリアの「絶頂」を表現します。2級らしい語彙の選択です。" },
+  { "level": "2級", "type": "cloze", "word_or_question": "Prenez (   ) de cet enfant.", "meaning": "この子の世話をしてください。", "choice1": "soin", "choice2": "garde", "choice3": "attention", "choice4": "compte", "answer": "soin", "comment": "【熟語】prendre soin de 〜 で「〜の世話をする、大事にする」。prendre garde は「注意する」なので混同注意。" }
+
 ]
