@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仏検対策ドリル</title>
+    <!-- CSVを読み込むための便利ツールを追加 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         /* 洗練されたフレンチモダン・カラー */
         :root { 
@@ -50,7 +52,6 @@
 
         h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 0.5px; }
 
-        /* バッジ */
         .level-badge { 
             background: var(--bleu); 
             color: var(--blanc); 
@@ -63,7 +64,6 @@
             display: inline-block; 
         }
 
-        /* メニューのセクション見出し */
         .section-title {
             font-size: 0.85rem; 
             font-weight: 700; 
@@ -74,12 +74,8 @@
             padding-bottom: 6px;
         }
 
-        /* 選択ボタン */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        
-        /* 奇数個のボタンがある時に、最後のボタンを幅広にするためのクラス */
         .span-2 { grid-column: span 2; }
-
         .menu-btn { 
             width: 100%; 
             padding: 16px; 
@@ -103,7 +99,6 @@
         .btn-weak:hover:not(:disabled) { background: #FFF5F5; }
         .btn-typing { border: 1px dashed var(--text-light); background: transparent; color: var(--text-main); margin-top: 8px;}
 
-        /* 分析エリア */
         .stats-card { margin-bottom: 1rem; text-align: left; }
         .stat-row { margin-bottom: 12px; }
         .stat-label { font-size: 0.75rem; color: var(--text-light); display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
@@ -111,19 +106,16 @@
         .bar-fill { background: var(--bleu); height: 100%; width: 0%; transition: width 0.8s ease; }
         .weak { background: var(--rouge) !important; }
 
-        /* クイズ画面 */
         .question-text { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; color: var(--text-main); line-height: 1.4; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; }
         .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.95rem; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        /* タイピング入力 */
         #typing-input { 
             width: 90%; padding: 14px; font-size: 1.1rem; border: 1px solid var(--bleu); border-radius: 12px; 
             text-align: center; outline: none; color: var(--text-main); background: #fff; margin: 0 auto; display: block;
         }
         #typing-input::placeholder { color: #A0AEC0; font-size: 0.9rem; }
 
-        /* フィードバック・解説 */
         #feedback { margin-top: 1.5rem; font-weight: 600; font-size: 1.2rem; height: 1.5rem; }
         #feedback-area { display: none; margin-top: 1rem; }
         
@@ -158,6 +150,7 @@
 <div id="app-container">
     <div id="loading-screen" class="screen active">
         <h1 style="color:var(--text-light)">Chargement...</h1>
+        <p style="color:var(--text-light); font-size: 0.8rem;">データを同期しています</p>
     </div>
 
     <!-- メニュー画面 -->
@@ -165,7 +158,7 @@
         <h1>仏検対策ドリル</h1>
         <div class="stats-card">
             <div id="stats-list"></div>
-            <button class="clear-btn" onclick="clearHistory()">すべての学習データをリセット</button>
+            <button class="clear-btn" onclick="clearHistory()">学習履歴リセット</button>
         </div>
 
         <div class="section-title">📘 級別で学ぶ</div>
@@ -186,7 +179,6 @@
             <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '動詞の活用')">動詞の活用</button>
             <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '熟語・表現')">熟語・表現</button>
             <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '会話・応答')">会話・応答</button>
-            <!-- 7つ目で奇数になるため、長文読解は2列分（幅いっぱい）使う -->
             <button class="menu-btn span-2" onclick="startQuiz('ALL', 'choice', '長文読解')">長文読解</button>
         </div>
 
@@ -201,13 +193,11 @@
     <div id="range-select-screen" class="screen">
         <h1>出題範囲の選択</h1>
         <p style="color:var(--text-light); font-size:0.9rem; margin-bottom: 2rem;">どの問題に挑戦しますか？</p>
-        
         <div style="display:flex; flex-direction:column; gap:12px;">
             <button id="range-unlearned-btn" class="menu-btn btn-mix" onclick="confirmStartQuiz('unlearned')">🌱 未学習の問題 (...問)</button>
             <button id="range-weak-btn" class="menu-btn btn-weak" onclick="confirmStartQuiz('weak')">🔥 苦手な問題 (...問)</button>
             <button id="range-all-btn" class="menu-btn" onclick="confirmStartQuiz('all')">📚 すべての問題 (...問)</button>
         </div>
-        
         <button class="clear-btn" style="margin-top:2rem; text-decoration:none;" onclick="switchScreen('menu-screen')">← メニューに戻る</button>
     </div>
 
@@ -216,20 +206,14 @@
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
-        
         <div id="choices-container" class="grid-choices"></div>
-        <div id="typing-container" style="display:none;">
-            <input type="text" id="typing-input" autocomplete="off" spellcheck="false">
-        </div>
-
+        <div id="typing-container" style="display:none;"><input type="text" id="typing-input" autocomplete="off" spellcheck="false"></div>
         <div id="feedback"></div>
-
         <div id="feedback-area">
             <div id="commentary-box"><span id="commentary-text"></span></div>
             <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
             <button id="next-btn" class="menu-btn btn-mix" onclick="handleNext()">Suivant (次へ)</button>
         </div>
-
         <div class="progress">Question <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
@@ -243,52 +227,39 @@
 </div>
 
 <script>
+    // ==========================================
+    // ⬇️ ここにステップ2でコピーしたURLを貼り付けます ⬇️
+    const SHEET_CSV_URL = "ここにURLを貼り付けます";
+    // ==========================================
+
     let database = [];
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
     let currentMode = 'choice';
     let lastSpokenText = "";
-    
     let quizConfig = { lvl: 'ALL', mode: 'choice', targetCategory: 'ALL' };
-    
     let synth = window.speechSynthesis || null;
     let voices = [];
-
     let history = {};
     let answeredQuestions = [];
     let wrongQuestions = []; 
 
     try {
-        const savedHistory = localStorage.getItem('fuken_history');
-        if (savedHistory) history = JSON.parse(savedHistory);
-        
-        const savedAnswered = localStorage.getItem('fuken_answered');
-        if (savedAnswered) answeredQuestions = JSON.parse(savedAnswered);
-
-        const savedWrong = localStorage.getItem('fuken_wrong');
-        if (savedWrong) wrongQuestions = JSON.parse(savedWrong);
-    } catch (e) {
-        history = {};
-        answeredQuestions = [];
-        wrongQuestions = [];
-    }
+        if (localStorage.getItem('fuken_history')) history = JSON.parse(localStorage.getItem('fuken_history'));
+        if (localStorage.getItem('fuken_answered')) answeredQuestions = JSON.parse(localStorage.getItem('fuken_answered'));
+        if (localStorage.getItem('fuken_wrong')) wrongQuestions = JSON.parse(localStorage.getItem('fuken_wrong'));
+    } catch (e) { history = {}; answeredQuestions = []; wrongQuestions = []; }
 
     function initSpeech() {
         if (!synth) return;
-        try {
-            const silentUtterance = new SpeechSynthesisUtterance("");
-            synth.speak(silentUtterance);
-            loadVoices();
-        } catch(e) {}
+        try { synth.speak(new SpeechSynthesisUtterance("")); loadVoices(); } catch(e) {}
     }
 
     function loadVoices() {
         if (!synth) return;
         voices = synth.getVoices();
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
-        }
+        if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     }
 
     function speakFrench(text) {
@@ -317,43 +288,53 @@
         } catch(e) {}
     }
 
-    // 分析ダッシュボードのカテゴリーを新しい7つに変更
     function renderStats() {
         const list = document.getElementById('stats-list');
         list.innerHTML = "";
         const categories = ["語彙", "前置詞", "代名詞", "動詞の活用", "熟語・表現", "会話・応答", "長文読解"];
         categories.forEach(cat => {
             const data = history[cat] || { correct: 0, total: 0 };
-            // 問題が1回も解かれていない項目は表示しない（スッキリさせるため）
             if (data.total === 0) return; 
-
             const percent = Math.round((data.correct / data.total) * 100);
             let colorClass = (percent < 60) ? "weak" : "";
             list.innerHTML += `<div class="stat-row"><div class="stat-label"><span>${cat}</span><span>${percent}%</span></div><div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div></div>`;
         });
-        if (list.innerHTML === "") {
-            list.innerHTML = "<p style='font-size:0.8rem; color:#888;'>問題を解くとここに正解率が表示されます。</p>";
-        }
+        if (list.innerHTML === "") list.innerHTML = "<p style='font-size:0.8rem; color:#888;'>問題を解くとここに正解率が表示されます。</p>";
     }
 
     function clearHistory() {
         if (confirm("正答率、未学習リスト、苦手リストをすべてリセットしますか？")) {
-            localStorage.removeItem('fuken_history'); 
-            localStorage.removeItem('fuken_answered'); 
-            localStorage.removeItem('fuken_wrong'); 
-            history = {}; 
-            answeredQuestions = [];
-            wrongQuestions = [];
-            renderStats();
+            localStorage.removeItem('fuken_history'); localStorage.removeItem('fuken_answered'); localStorage.removeItem('fuken_wrong'); 
+            history = {}; answeredQuestions = []; wrongQuestions = []; renderStats();
         }
     }
 
+    // ★CSV（スプレッドシート）読み込み機能
     async function loadData() {
+        if (SHEET_CSV_URL === "ここにURLを貼り付けます") {
+            document.getElementById('loading-screen').innerHTML = `
+                <h1 style="color:var(--rouge); font-size:1.2rem;">設定エラー</h1>
+                <p style="color:var(--text-light); font-size:0.9rem;">コード内の <code>SHEET_CSV_URL</code> に<br>スプレッドシートのURLを貼り付けてください。</p>`;
+            return;
+        }
+
         try {
-            const response = await fetch('questions.json?t=' + Date.now());
-            if (!response.ok) throw new Error("JSON読み込み失敗");
+            // キャッシュ防止のためにURLの末尾にタイムスタンプをつける
+            const fetchUrl = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
             
-            database = await response.json();
+            database = await new Promise((resolve, reject) => {
+                Papa.parse(fetchUrl, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        resolve(results.data);
+                    },
+                    error: function(err) {
+                        reject(err);
+                    }
+                });
+            });
             
             renderStats();
             document.getElementById('loading-screen').classList.remove('active');
@@ -362,28 +343,19 @@
         } catch (e) { 
             document.getElementById('loading-screen').innerHTML = `
                 <h1 style="color:var(--rouge); font-size:1.2rem;">エラーが発生しました</h1>
-                <p style="color:var(--text-light); font-size:0.9rem;">JSONデータを確認してください。</p>`;
+                <p style="color:var(--text-light); font-size:0.9rem;">スプレッドシートの読み込みに失敗しました。</p>`;
         }
     }
 
-    // ★旧データの「名詞の性」や「前置詞・文法」を新カテゴリーの7つに自動で振り分ける関数
     function getCategory(q) {
         let cat = q.category || "";
-        
-        // 既存のJSONデータへの対応（自動変換）
         if (cat === "名詞の性" || q.type === "gender") return "語彙";
-        
         if (cat === "前置詞・文法" || cat === "") {
             const text = (q.word_or_question || "").toLowerCase();
-            // 関係代名詞や代名詞（qui, que, dont, y, en, le, la, luiなど）が含まれているか簡易チェック
-            if (/\b(qui|que|dont|lequel|laquelle|y|en|le|la|les|lui|leur|moi|toi)\b/.test(text)) {
-                return "代名詞";
-            }
-            // それ以外は前置詞扱い
+            if (/\b(qui|que|dont|lequel|laquelle|y|en|le|la|les|lui|leur|moi|toi)\b/.test(text)) return "代名詞";
             return "前置詞";
         }
-        
-        return cat; // "動詞の活用" や "熟語・表現" などはそのまま返す
+        return cat;
     }
 
     function getQuestionId(q) {
@@ -400,7 +372,7 @@
 
         const totalCount = filtered.length;
         if (totalCount === 0) {
-            return alert("該当する問題がまだ登録されていません。\n(後日追加される予定です)");
+            return alert("該当する問題がまだスプレッドシートに登録されていません。");
         }
 
         const unlearnedCount = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q))).length;
@@ -410,20 +382,16 @@
         
         const unlearnBtn = document.getElementById('range-unlearned-btn');
         if (unlearnedCount === 0) {
-            unlearnBtn.disabled = true;
-            unlearnBtn.textContent = `🌱 未学習の問題 (すべて学習済み🎉)`;
+            unlearnBtn.disabled = true; unlearnBtn.textContent = `🌱 未学習の問題 (すべて学習済み🎉)`;
         } else {
-            unlearnBtn.disabled = false;
-            unlearnBtn.textContent = `🌱 未学習の問題 (${unlearnedCount}問から)`;
+            unlearnBtn.disabled = false; unlearnBtn.textContent = `🌱 未学習の問題 (${unlearnedCount}問から)`;
         }
 
         const weakBtn = document.getElementById('range-weak-btn');
         if (weakCount === 0) {
-            weakBtn.disabled = true;
-            weakBtn.textContent = `🔥 苦手な問題 (なし🎉)`;
+            weakBtn.disabled = true; weakBtn.textContent = `🔥 苦手な問題 (なし🎉)`;
         } else {
-            weakBtn.disabled = false;
-            weakBtn.textContent = `🔥 苦手な問題 (${weakCount}問から)`;
+            weakBtn.disabled = false; weakBtn.textContent = `🔥 苦手な問題 (${weakCount}問から)`;
         }
 
         switchScreen('range-select-screen');
@@ -461,7 +429,7 @@
         const q = currentQuestions[currentIndex];
         document.getElementById('level-tag').textContent = q.level;
         document.getElementById('current-count').textContent = currentIndex + 1;
-        document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
+        document.getElementById('question-display').textContent = q.type === 'gender' ? (q.word || q.word_or_question) : q.word_or_question;
         document.getElementById('meaning-display').textContent = q.meaning;
         document.getElementById('feedback').textContent = "";
         document.getElementById('feedback-area').style.display = "none";
@@ -486,10 +454,8 @@
         } else {
             choicesDiv.style.display = 'none';
             typingDiv.style.display = 'block';
-            
             input.style.display = 'block'; 
-            input.value = ""; 
-            input.disabled = false;
+            input.value = ""; input.disabled = false;
             input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
             setTimeout(() => input.focus(), 100);
         }
@@ -497,15 +463,12 @@
 
     document.getElementById('typing-input').onkeypress = function(e) {
         if (e.key === 'Enter' && this.value.trim() !== "") {
-            this.disabled = true;
-            this.blur(); // スマホキーボードを閉じる
-            check(this.value.trim());
+            this.disabled = true; this.blur(); check(this.value.trim());
         }
     };
 
     function check(userAns) {
         const q = currentQuestions[currentIndex];
-        
         let input = String(userAns).toLowerCase().trim().replace(/’/g, "'");
         let correctAns = String(q.answer).toLowerCase().replace(/’/g, "'");
         
@@ -516,7 +479,7 @@
         let defArt = "";
 
         if (q.type === 'gender') {
-            defArt = getDefArticle(q.word, q.answer).trim();
+            defArt = getDefArticle(q.word || q.word_or_question, q.answer).trim();
             if (currentMode === 'typing') {
                 if (input === defArt || input === defArt.replace("'","") || input === correctAns) isCorrect = true;
             } else {
@@ -527,7 +490,6 @@
         }
 
         const qId = getQuestionId(q);
-        
         if (!answeredQuestions.includes(qId)) {
             answeredQuestions.push(qId);
             localStorage.setItem('fuken_answered', JSON.stringify(answeredQuestions));
@@ -558,7 +520,7 @@
 
         let textToSpeak = "";
         if (q.type === 'gender') {
-            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
+            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + (q.word || q.word_or_question);
         } else {
             textToSpeak = q.word_or_question;
             const answers = q.answer.split('/').map(s => s.trim());
@@ -580,7 +542,6 @@
         
         document.getElementById('feedback-area').style.display = "block";
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
-        
         if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
     }
 
