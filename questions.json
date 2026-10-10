@@ -84,8 +84,7 @@
     "choice3": "faisait",
     "choice4": "serait",
     "answer": "sera"
-  }
-
+  },
   { "level": "5級", "type": "cloze", "word_or_question": "Je (   ) français.", "meaning": "私はフランス人です。", "choice1": "suis", "choice2": "es", "choice3": "est", "choice4": "sommes", "answer": "suis" },
   { "level": "5級", "type": "cloze", "word_or_question": "Tu (   ) un chat.", "meaning": "君は猫を飼っています。", "choice1": "as", "choice2": "ai", "choice3": "a", "choice4": "avez", "answer": "as" },
   { "level": "5級", "type": "cloze", "word_or_question": "Il (   ) du tennis.", "meaning": "彼はテニスをします。", "choice1": "fait", "choice2": "fais", "choice3": "font", "choice4": "faites", "answer": "fait" },
@@ -186,5 +185,4 @@
   { "level": "4級", "type": "cloze", "word_or_question": "Je (   ) finir ça.", "meaning": "私はこれを終えなければならない。", "choice1": "dois", "choice2": "doit", "choice3": "devons", "choice4": "devez", "answer": "dois" },
   { "level": "4級", "type": "cloze", "word_or_question": "Elle (   ) la vérité.", "meaning": "彼女は真実を知っている。", "choice1": "sait", "choice2": "sais", "choice3": "connaît", "choice4": "croit", "answer": "sait" },
   { "level": "4級", "type": "cloze", "word_or_question": "Ils (   ) un gâteau.", "meaning": "彼らはケーキを作る。", "choice1": "font", "choice2": "fait", "choice3": "faisons", "choice4": "faites", "answer": "font" }
-
 ]
