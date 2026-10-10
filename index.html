@@ -236,24 +236,17 @@
     let lastSpokenText = "";
     let quizConfig = { lvl: 'ALL', mode: 'choice', targetCategory: 'ALL' };
     
-    // --- 音声関連の初期化 ---
     let synth = window.speechSynthesis || null;
     let voices = [];
     
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
-    // 電子音（ピコーン/ブブー）の初期化
     function initAudioContext() {
-        if (!audioCtx) {
-            audioCtx = new AudioContext();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // 正誤の電子音を鳴らす関数
     function playBeepSound(isCorrect) {
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
@@ -262,22 +255,18 @@
         gain.connect(audioCtx.destination);
         
         if (isCorrect) {
-            // 正解音（ピコーン）
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // ラ
-            osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.1); // ミ
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.1);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         } else {
-            // 不正解音（ブブー）
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, audioCtx.currentTime); // 低いラ
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         }
     }
 
@@ -381,6 +370,7 @@
         }
     }
 
+    // ★修正1：カテゴリー自動判別のルールを変更（「名詞の性」を「語彙」に統合）
     function getCategory(q) {
         let cat = q.category || "";
         if (cat === "名詞の性" || q.type === "gender") return "語彙";
@@ -392,13 +382,18 @@
         return cat;
     }
 
+    // ★修正2：答えが「男性」または「女性」なら、それを性別問題として扱う
+    function isGenderQuestion(q) {
+        return q.answer === "男性" || q.answer === "女性";
+    }
+
     function getQuestionId(q) {
-        return q.level + "_" + q.type + "_" + (q.word || q.word_or_question);
+        return q.level + "_" + getCategory(q) + "_" + (q.word || q.word_or_question);
     }
 
     function startQuiz(lvl, mode, targetCategory = 'ALL') {
         initSpeech();
-        initAudioContext(); // ユーザーのクリックで電子音のエンジンを初期化
+        initAudioContext(); 
         quizConfig = { lvl, mode, targetCategory };
         
         let filtered = database;
@@ -450,11 +445,11 @@
         showQuestion();
     }
 
-    function getDefArticle(word, gender) {
+    function getDefArticle(word, answer) {
         if (!word || word.length === 0) return "";
         const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ù'];
         if (vowels.includes(word[0].toLowerCase())) return "l'";
-        return (gender === "男性") ? "le " : "la ";
+        return (answer === "男性") ? "le " : "la ";
     }
 
     function showQuestion() {
@@ -462,7 +457,7 @@
         document.getElementById('level-tag').textContent = q.level;
         document.getElementById('current-count').textContent = currentIndex + 1;
         
-        let qText = q.type === 'gender' ? (q.word || q.word_or_question) : q.word_or_question;
+        let qText = isGenderQuestion(q) ? (q.word || q.word_or_question) : q.word_or_question;
         document.getElementById('question-display').innerHTML = qText.replace(/\\n|\n/g, '<br>');
         document.getElementById('meaning-display').innerHTML = (q.meaning || "").replace(/\\n|\n/g, '<br>');
         
@@ -477,7 +472,8 @@
             choicesDiv.style.display = 'grid';
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
-            const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
+            
+            const choices = isGenderQuestion(q) ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
             
             choices.forEach(c => {
                 const btn = document.createElement('button');
@@ -491,7 +487,7 @@
             typingDiv.style.display = 'block';
             input.style.display = 'block'; 
             input.value = ""; input.disabled = false;
-            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
+            input.placeholder = isGenderQuestion(q) ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
             setTimeout(() => input.focus(), 100);
         }
     }
@@ -512,7 +508,7 @@
         let isCorrect = false;
         let defArt = "";
 
-        if (q.type === 'gender') {
+        if (isGenderQuestion(q)) {
             defArt = getDefArticle(q.word || q.word_or_question, q.answer).trim();
             if (currentMode === 'typing') {
                 if (input === defArt || input === defArt.replace("'","") || input === correctAns) isCorrect = true;
@@ -546,19 +542,17 @@
 
         const fb = document.getElementById('feedback');
         let displayAns = q.answer;
-        if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
+        if (isGenderQuestion(q)) displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
         
         fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
         fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
         
         if (isCorrect) score++;
 
-        // ★ここで正誤の電子音（ピコーン/ブブー）を鳴らします
         playBeepSound(isCorrect);
 
-        // その後、フランス語の読み上げを開始します
         let textToSpeak = "";
-        if (q.type === 'gender') {
+        if (isGenderQuestion(q)) {
             textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + (q.word || q.word_or_question);
         } else {
             textToSpeak = q.word_or_question;
