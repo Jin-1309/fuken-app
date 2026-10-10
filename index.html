@@ -3,48 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検対策</title>
+    <title>仏検対策：フラ単 Pro</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f8f9fa; --success: #2d6a4f; --text-main: #2d3436; --card-bg: #ffffff; }
-        body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: var(--text-main); }
-        #app-container { background: var(--card-bg); padding: 2.5rem 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); width: 95%; max-width: 420px; text-align: center; }
-        .screen { display: none; animation: fadeIn 0.4s ease-out; }
+        /* フランス国旗のカラーを定義 */
+        :root { 
+            --bleu: #0055A4; 
+            --blanc: #FFFFFF; 
+            --rouge: #EF4135; 
+            --text-main: #2C3E50; 
+            --text-light: #7F8C8D;
+            --bg-color: #F8F9FA;
+            --border: #E2E8F0;
+        }
+
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            color: var(--text-main); 
+        }
+
+        #app-container { 
+            background: var(--blanc); 
+            padding: 3rem 2.5rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+
+        .screen { display: none; animation: fadeIn 0.3s ease-out; }
         .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--primary); }
-        .level-badge { background: rgba(26, 42, 108, 0.1); color: var(--primary); padding: 6px 16px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; display: inline-block; }
-        .menu-btn { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #edf2f7; border-radius: 16px; cursor: pointer; font-size: 0.95rem; font-weight: 600; background: white; transition: 0.2s; }
-        .menu-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--primary); background: #fdfdfd; }
-        .btn-mix { background: var(--primary); color: white; border: none; }
-        .btn-typing { border: 1px dashed var(--primary); color: var(--primary); }
-        .stats-card { background: #fcfcfd; padding: 1.2rem; border-radius: 20px; border: 1px solid #f1f3f5; margin-bottom: 2rem; text-align: left; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 1px; }
+
+        /* バッジ */
+        .level-badge { 
+            background: var(--bleu); 
+            color: var(--blanc); 
+            padding: 4px 14px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem; 
+            display: inline-block; 
+        }
+
+        /* ボタン（シンプルでおしゃれに） */
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+        .menu-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.95rem; 
+            background: var(--blanc); 
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .menu-btn:hover:not(:disabled) { 
+            border-color: var(--bleu); 
+            color: var(--bleu);
+            background: #F5F9FD;
+        }
+        .btn-mix { background: var(--bleu); color: var(--blanc); border: none; font-weight: bold; margin-top: 5px; }
+        .btn-mix:hover:not(:disabled) { background: #004488; color: var(--blanc); }
+        .btn-typing { border: 1px dashed var(--bleu); color: var(--bleu); }
+
+        /* 分析エリア（スッキリと） */
+        .stats-card { 
+            margin-bottom: 2rem; 
+            text-align: left; 
+        }
         .stat-row { margin-bottom: 12px; }
-        .stat-label { font-size: 0.7rem; font-weight: 700; color: #718096; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .bar-bg { background: #edf2f7; height: 6px; border-radius: 10px; overflow: hidden; }
-        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.8s ease; }
-        .weak { background: var(--accent) !important; }
-        .strong { background: var(--success) !important; }
-        .question-text { font-size: 1.8rem; font-weight: 700; margin: 1.5rem 0 0.5rem 0; color: #1a202c; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
-        .meaning { color: #a0aec0; margin-bottom: 2rem; font-size: 0.9rem; }
-        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        #typing-input { width: 90%; padding: 14px; font-size: 1.1rem; border: 2px solid #edf2f7; border-radius: 14px; text-align: center; margin: 0 auto; outline: none; }
-        #feedback { margin-top: 1.2rem; font-weight: 700; font-size: 1.1rem; min-height: 1.5rem; }
-        #feedback-area { display: none; }
-        #commentary-box { background: #fffcf0; border-radius: 16px; padding: 1.2rem; margin-top: 1.5rem; text-align: left; font-size: 0.85rem; line-height: 1.6; color: #4a5568; border: 1px solid #fef3c7; }
-        #audio-repeat-btn { background: #edf2f7; color: var(--primary); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; margin: 1rem auto; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .next-btn { background: var(--primary); color: white; border: none; margin-top: 1rem; font-weight: 700; }
-        .progress { margin-top: 2rem; color: #cbd5e0; font-size: 0.75rem; font-weight: 600; }
-        button:disabled { opacity: 0.4; }
-        .clear-btn { background: none; border: none; color: #cbd5e0; font-size: 0.65rem; text-decoration: underline; cursor: pointer; margin-top: 8px; width: 100%; text-align: right; }
+        .stat-label { font-size: 0.75rem; color: var(--text-light); display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: bold; }
+        .bar-bg { background: var(--border); height: 4px; border-radius: 2px; overflow: hidden; }
+        .bar-fill { background: var(--bleu); height: 100%; width: 0%; transition: width 0.8s ease; }
+        .weak { background: var(--rouge) !important; }
+
+        /* クイズ画面 */
+        .question-text { font-size: 1.7rem; font-weight: bold; margin: 1rem 0; color: var(--text-main); line-height: 1.4; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
+        .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.9rem; }
+        .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* タイピング入力 */
+        #typing-input { 
+            width: 90%; padding: 14px; font-size: 1.1rem; border: 1px solid var(--bleu); border-radius: 8px; 
+            text-align: center; outline: none; color: var(--text-main);
+        }
+
+        /* フィードバック・解説 */
+        #feedback { margin-top: 1.5rem; font-weight: bold; font-size: 1.1rem; height: 1.5rem; }
+        #feedback-area { display: none; margin-top: 1rem; }
+        
+        /* 解説ボックスを左赤線のスタイリッシュなデザインに */
+        #commentary-box { 
+            background: #F8FAFC; 
+            border-left: 4px solid var(--rouge); 
+            padding: 1rem; 
+            text-align: left; 
+            font-size: 0.85rem; 
+            line-height: 1.6; 
+            color: var(--text-main);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+        }
+        
+        /* 再生ボタン */
+        #audio-repeat-btn { 
+            background: none; color: var(--bleu); border: 1px solid var(--bleu); border-radius: 50%; 
+            width: 40px; height: 40px; cursor: pointer; margin: 0 auto 15px auto; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+        #audio-repeat-btn:hover { background: var(--bleu); color: white; }
+
+        .progress { margin-top: 2rem; color: var(--border); font-size: 0.75rem; letter-spacing: 1px; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.7rem; text-decoration: underline; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; }
     </style>
 </head>
 <body>
+
 <div id="app-container">
     <div id="loading-screen" class="screen active"><h1>Chargement...</h1></div>
+
     <div id="menu-screen" class="screen">
-        <h1>🇫🇷 Progrès</h1>
-        <div class="stats-card"><div id="stats-list"></div><button class="clear-btn" onclick="clearHistory()">Reset History</button></div>
+        <h1>FRANC TEST</h1>
+        <div class="stats-card">
+            <div id="stats-list"></div>
+            <button class="clear-btn" onclick="clearHistory()">履歴リセット</button>
+        </div>
         <div class="menu-grid">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
@@ -52,29 +149,37 @@
                 <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
                 <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
             </div>
-            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">All Levels Mix</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ Typing (le/la/l')</button>
+            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス (4択)</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング (le/la/l')</button>
         </div>
     </div>
+
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
+        
         <div id="choices-container" class="grid-choices"></div>
-        <div id="typing-container" style="display:none;"><input type="text" id="typing-input" autocomplete="off" spellcheck="false"></div>
-        <div id="feedback"></div>
-        <div id="feedback-area">
-            <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
-            <div id="commentary-box"><span></span></div>
-            <button class="menu-btn next-btn" onclick="handleNext()">Continuer</button>
+        <div id="typing-container" style="display:none;">
+            <input type="text" id="typing-input" autocomplete="off" spellcheck="false">
         </div>
+
+        <div id="feedback"></div>
+
+        <div id="feedback-area">
+            <div id="commentary-box"><span id="commentary-text"></span></div>
+            <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
+            <button class="menu-btn btn-mix" onclick="handleNext()">Suivant (次へ)</button>
+        </div>
+
         <div class="progress">Question <span id="current-count">0</span> / 10</div>
     </div>
+
     <div id="result-screen" class="screen">
-        <h2 style="color: var(--primary)">Résultat</h2>
-        <div style="font-size: 4.5rem; font-weight: 800; color: var(--primary); margin: 1rem 0;" id="final-score">0</div>
-        <p id="evaluation-msg" style="margin-bottom: 2rem;"></p>
-        <button class="menu-btn btn-mix" onclick="location.reload()">Retour</button>
+        <h2 style="color: var(--text-main); font-size: 1.2rem;">Résultat</h2>
+        <div style="font-size: 4.5rem; font-weight: 700; color: var(--bleu); margin: 1rem 0;" id="final-score">0</div>
+        <p id="evaluation-msg" style="margin-bottom: 2rem; color: var(--text-light); font-size: 0.9rem;"></p>
+        <button class="menu-btn btn-mix" onclick="location.reload()">ダッシュボードへ</button>
     </div>
 </div>
 
@@ -131,7 +236,7 @@
         categories.forEach(cat => {
             const data = history[cat] || { correct: 0, total: 0 };
             const percent = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-            let colorClass = (percent < 50 && data.total > 0) ? "weak" : (percent > 80 ? "strong" : "");
+            let colorClass = (percent < 60 && data.total > 0) ? "weak" : "";
             list.innerHTML += `<div class="stat-row"><div class="stat-label"><span>${cat}</span><span>${percent}%</span></div><div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div></div>`;
         });
     }
@@ -150,7 +255,7 @@
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('menu-screen').classList.add('active');
             loadVoices();
-        } catch (e) { document.getElementById('loading-screen').innerHTML = "JSON Load Error"; }
+        } catch (e) { document.getElementById('loading-screen').innerHTML = "Data Load Error"; }
     }
 
     function startQuiz(lvl, mode) {
@@ -158,7 +263,7 @@
         currentMode = mode;
         let filtered = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("No problems found.");
+        if (currentQuestions.length === 0) return alert("問題がありません");
         currentIndex = 0; score = 0;
         switchScreen('quiz-screen');
         showQuestion();
@@ -167,13 +272,9 @@
     function getCategory(q) {
         if (q.category) return q.category;
         if (q.type === 'gender') return "名詞の性";
-        const qText = q.word_or_question || "";
-        if (qText.includes('de') || qText.includes('à') || q.level === '2級') return "前置詞・文法";
-        if (q.meaning.includes('ばかり') || q.meaning.includes('つもり')) return "動詞の活用";
-        return "熟語・表現";
+        return "前置詞・文法";
     }
 
-    // 読み上げ用の冠詞を判定する関数
     function getDefArticle(word, gender) {
         const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ù'];
         if (vowels.includes(word[0].toLowerCase())) return "l'";
@@ -198,17 +299,24 @@
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
             const choices = q.type === 'gender' ? ["男性 (le)", "女性 (la)"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c);
+            
             choices.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = 'menu-btn';
                 btn.textContent = c;
-                btn.onclick = () => check(c.split(" ")[0]); // "男性 (le)" の "男性" だけを渡す
+                // バグ修正：性別問題の場合のみ "男性" の部分を抽出。それ以外は c をそのまま渡す。
+                btn.onclick = () => {
+                    if (q.type === 'gender') {
+                        check(c.split(" ")[0]);
+                    } else {
+                        check(c);
+                    }
+                };
                 choicesDiv.appendChild(btn);
             });
         } else {
             choicesDiv.style.display = 'none';
             typingDiv.style.display = 'block';
-            input.style.display = 'block';
             input.value = ""; input.disabled = false;
             input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
             setTimeout(() => input.focus(), 100);
@@ -231,7 +339,6 @@
         const defArt = getDefArticle(q.word || "", q.answer).trim();
 
         if (q.type === 'gender') {
-            // タイピングの場合の判定
             if (currentMode === 'typing') {
                 if (input === defArt || input === defArt.replace("'","") || input === q.answer) isCorrect = true;
             } else {
@@ -248,20 +355,18 @@
         if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
         
         fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
-        fb.style.color = isCorrect ? "var(--success)" : "var(--accent)";
+        fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
         if (isCorrect) score++;
 
-        // --- 読み上げロジックの修正 ---
         let textToSpeak = "";
         if (q.type === 'gender') {
             textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
         } else {
-            // カッコ (   ) を正解の単語で置換。正規表現でスペースの数に関わらず対応
             textToSpeak = q.word_or_question.replace(/\(\s*\)/, q.answer);
         }
         speakFrench(textToSpeak);
 
-        document.querySelector('#commentary-box span').textContent = q.comment || "Pas de commentaire.";
+        document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
         document.getElementById('feedback-area').style.display = "block";
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
         if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
@@ -276,7 +381,7 @@
     function showResult() {
         switchScreen('result-screen');
         document.getElementById('final-score').textContent = score + " / 10";
-        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Bravo ! C'est parfait." : "Continuez vos efforts !";
+        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
     }
 
     function switchScreen(id) {
