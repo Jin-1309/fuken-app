@@ -31,19 +31,26 @@
 
         #app-container { 
             background: var(--blanc); 
-            padding: 3rem 2.5rem; 
+            padding: 2.5rem 2rem; 
             border-radius: 24px; 
             box-shadow: 0 4px 24px rgba(0,0,0,0.04); 
             width: 90%; 
             max-width: 400px; 
             text-align: center; 
+            /* スマホでボタンが増えてもスクロールできるようにする */
+            max-height: 90vh;
+            overflow-y: auto;
         }
+        
+        /* スクロールバーを少し目立たなくする */
+        #app-container::-webkit-scrollbar { width: 6px; }
+        #app-container::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 3px; }
 
         .screen { display: none; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 0.5px; }
+        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-main); letter-spacing: 0.5px; }
 
         /* バッジ */
         .level-badge { 
@@ -58,15 +65,26 @@
             display: inline-block; 
         }
 
+        /* メニューのセクション見出し */
+        .section-title {
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--text-light); 
+            text-align: left; 
+            margin: 1.5rem 0 0.5rem 0; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 6px;
+        }
+
         /* 選択ボタン */
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .menu-btn { 
             width: 100%; 
-            padding: 16px; 
+            padding: 14px; 
             border: 1px solid transparent; 
             border-radius: 12px; 
             cursor: pointer; 
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             background: var(--btn-bg); 
             color: var(--text-main);
             transition: all 0.2s ease;
@@ -77,12 +95,12 @@
             color: var(--bleu);
             background: #F0F7FF;
         }
-        .btn-mix { background: var(--bleu); color: var(--blanc); font-weight: 600; margin-top: 8px; }
+        .btn-mix { background: var(--bleu); color: var(--blanc); font-weight: 600; }
         .btn-mix:hover:not(:disabled) { background: #004488; color: var(--blanc); }
         .btn-typing { border: 1px dashed var(--text-light); background: transparent; color: var(--text-main); }
 
         /* 分析エリア */
-        .stats-card { margin-bottom: 2rem; text-align: left; }
+        .stats-card { margin-bottom: 1rem; text-align: left; }
         .stat-row { margin-bottom: 12px; }
         .stat-label { font-size: 0.75rem; color: var(--text-light); display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
         .bar-bg { background: var(--border); height: 4px; border-radius: 2px; overflow: hidden; }
@@ -105,7 +123,6 @@
         #feedback { margin-top: 1.5rem; font-weight: 600; font-size: 1.2rem; height: 1.5rem; }
         #feedback-area { display: none; margin-top: 1rem; }
         
-        /* 解説ボックス */
         #commentary-box { 
             background: var(--btn-bg); 
             border-left: 3px solid var(--rouge); 
@@ -118,7 +135,6 @@
             margin-bottom: 15px;
         }
         
-        /* 再生ボタン */
         #audio-repeat-btn { 
             background: none; color: var(--bleu); border: 1px solid var(--bleu); border-radius: 50%; 
             width: 44px; height: 44px; cursor: pointer; margin: 0 auto 15px auto; 
@@ -129,7 +145,7 @@
 
         .progress { margin-top: 2rem; color: var(--text-light); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.5px; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; transition: 0.2s; }
+        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 10px; width: 100%; text-align: center; transition: 0.2s; }
         .clear-btn:hover { color: var(--rouge); }
     </style>
 </head>
@@ -146,17 +162,29 @@
             <div id="stats-list"></div>
             <button class="clear-btn" onclick="clearHistory()">学習履歴リセット</button>
         </div>
+
+        <div class="section-title">📘 級別で学ぶ</div>
         <div class="menu-grid">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
-                <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
-                <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
-                <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
-                <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級</button>
-                <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級</button>
-            </div>
-            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング挑戦</button>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
+            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
+            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級</button>
+            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級</button>
+        </div>
+
+        <div class="section-title">📂 カテゴリー集中特訓 (全級)</div>
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '名詞の性')">名詞の性</button>
+            <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '動詞の活用')">動詞の活用</button>
+            <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '前置詞・文法')">前置詞・文法</button>
+            <button class="menu-btn" onclick="startQuiz('ALL', 'choice', '熟語・表現')">熟語・表現</button>
+        </div>
+
+        <div class="section-title">🎯 総合テスト</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級・全ジャンル ミックス</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング</button>
         </div>
     </div>
 
@@ -203,12 +231,8 @@
     let history = {};
     try {
         const saved = localStorage.getItem('fuken_history');
-        if (saved) {
-            history = JSON.parse(saved);
-        }
-    } catch (e) {
-        history = {};
-    }
+        if (saved) history = JSON.parse(saved);
+    } catch (e) { history = {}; }
 
     function initSpeech() {
         if (!synth) return;
@@ -231,7 +255,6 @@
         if (!synth) return;
         try {
             synth.cancel();
-            // 音声用テキストの正規化（アポストロフィ対応）
             const cleanText = text.replace(/’/g, "'");
             const uttr = new SpeechSynthesisUtterance(cleanText);
             uttr.lang = 'fr-FR';
@@ -292,25 +315,42 @@
         }
     }
 
-    function startQuiz(lvl, mode) {
-        initSpeech();
-        currentMode = mode;
-        let filtered = database;
-
-        // レベルによる絞り込み（タイピングは全問題出題に変更）
-        if (lvl !== 'ALL') filtered = filtered.filter(q => q.level === lvl);
-
-        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("該当する問題がありません");
-        currentIndex = 0; score = 0;
-        switchScreen('quiz-screen');
-        showQuestion();
-    }
-
     function getCategory(q) {
         if (q.category) return q.category;
         if (q.type === 'gender') return "名詞の性";
         return "前置詞・文法";
+    }
+
+    // 【修正ポイント】カテゴリーを指定してクイズを開始できるように引数を追加
+    function startQuiz(lvl, mode, targetCategory = 'ALL') {
+        initSpeech();
+        currentMode = mode;
+        let filtered = database;
+
+        // レベルによる絞り込み
+        if (lvl !== 'ALL') {
+            filtered = filtered.filter(q => q.level === lvl);
+        }
+
+        // カテゴリーによる絞り込み（新機能）
+        if (targetCategory !== 'ALL') {
+            filtered = filtered.filter(q => getCategory(q) === targetCategory);
+        }
+
+        // タイピングは名詞の性のみに限定
+        if (mode === 'typing') {
+            filtered = filtered.filter(q => q.type === 'gender');
+        }
+
+        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        if (currentQuestions.length === 0) {
+            return alert("該当する問題がまだ登録されていません。");
+        }
+        
+        currentIndex = 0; score = 0;
+        switchScreen('quiz-screen');
+        showQuestion();
     }
 
     function getDefArticle(word, gender) {
@@ -337,6 +377,7 @@
             choicesDiv.style.display = 'grid';
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
+            // 【修正】"(le)"などを消し、「男性」「女性」だけのシンプルな表示に変更
             const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
             
             choices.forEach(c => {
@@ -344,11 +385,7 @@
                 btn.className = 'menu-btn';
                 btn.textContent = c;
                 btn.onclick = () => {
-                    if (q.type === 'gender') {
-                        check(c.split(" ")[0]);
-                    } else {
-                        check(c);
-                    }
+                    check(c);
                 };
                 choicesDiv.appendChild(btn);
             });
@@ -359,8 +396,7 @@
             input.style.display = 'block'; 
             input.value = ""; 
             input.disabled = false;
-            // 問題タイプに合わせてヒント（プレースホルダー）を変更
-            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
+            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力";
             setTimeout(() => input.focus(), 100);
         }
     }
@@ -376,11 +412,9 @@
     function check(userAns) {
         const q = currentQuestions[currentIndex];
         
-        // スマートアポストロフィを置換
         let input = String(userAns).toLowerCase().trim().replace(/’/g, "'");
         let correctAns = String(q.answer).toLowerCase().replace(/’/g, "'");
         
-        // 複数穴埋め（スラッシュ）の前後のスペースを無視する処理
         input = input.replace(/\s*\/\s*/g, '/');
         correctAns = correctAns.replace(/\s*\/\s*/g, '/');
         
@@ -408,7 +442,6 @@
         fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
         if (isCorrect) score++;
 
-        // 音声読み上げ用テキスト生成
         let textToSpeak = "";
         if (q.type === 'gender') {
             textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
