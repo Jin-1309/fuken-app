@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検対策</title>
+    <title>仏検対策：フラ単 Pro</title>
     <style>
         /* 洗練されたフレンチモダン・カラー */
         :root { 
@@ -58,7 +58,7 @@
             display: inline-block; 
         }
 
-        /* 選択ボタン（Apple風のミニマルデザイン） */
+        /* 選択ボタン */
         .menu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
         .menu-btn { 
             width: 100%; 
@@ -104,7 +104,7 @@
         #feedback { margin-top: 1.5rem; font-weight: 600; font-size: 1.2rem; height: 1.5rem; }
         #feedback-area { display: none; margin-top: 1rem; }
         
-        /* 洗練された解説ボックス */
+        /* 解説ボックス */
         #commentary-box { 
             background: var(--btn-bg); 
             border-left: 3px solid var(--rouge); 
@@ -135,7 +135,9 @@
 <body>
 
 <div id="app-container">
-    <div id="loading-screen" class="screen active"><h1 style="color:var(--text-light)">Chargement...</h1></div>
+    <div id="loading-screen" class="screen active">
+        <h1 style="color:var(--text-light)">Chargement...</h1>
+    </div>
 
     <div id="menu-screen" class="screen">
         <h1>FRANC TEST</h1>
@@ -150,8 +152,8 @@
                 <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
                 <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
             </div>
-            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング</button>
+            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス (4択)</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング (le/la/l')</button>
         </div>
     </div>
 
@@ -178,7 +180,7 @@
 
     <div id="result-screen" class="screen">
         <h2 style="color: var(--text-light); font-size: 1rem; font-weight: 500;">Résultat</h2>
-        <div style="font-size: 4.5rem; font-weight: 700; color: var(--text-main); margin: 1rem 0;" id="final-score">0</div>
+        <div style="font-size: 4.5rem; font-weight: 700; color: var(--bleu); margin: 1rem 0;" id="final-score">0</div>
         <p id="evaluation-msg" style="margin-bottom: 2rem; color: var(--text-light); font-size: 0.95rem;"></p>
         <button class="menu-btn btn-mix" onclick="location.reload()">ダッシュボードへ</button>
     </div>
@@ -191,16 +193,241 @@
     let score = 0;
     let currentMode = 'choice';
     let lastSpokenText = "";
-    let synth = window.speechSynthesis;
+    
+    // Web Speech API の安全な初期化
+    let synth = window.speechSynthesis || null;
     let voices = [];
 
-    let history = JSON.parse(localStorage.getItem('fuken_history')) || {};
+    // ローカルストレージの安全な読み込み（フリーズ対策）
+    let history = {};
+    try {
+        const saved = localStorage.getItem('fuken_history');
+        if (saved) {
+            history = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.warn("History parse error:", e);
+        history = {};
+    }
 
     function initSpeech() {
-        const silentUtterance = new SpeechSynthesisUtterance("");
-        synth.speak(silentUtterance);
-        loadVoices();
+        if (!synth) return;
+        try {
+            const silentUtterance = new SpeechSynthesisUtterance("");
+            synth.speak(silentUtterance);
+            loadVoices();
+        } catch(e) {}
     }
 
     function loadVoices() {
-        voices = synth.getVoices
+        if (!synth) return;
+        voices = synth.getVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+        }
+    }
+
+    function speakFrench(text) {
+        if (!synth) return;
+        try {
+            synth.cancel();
+            const uttr = new SpeechSynthesisUtterance(text);
+            uttr.lang = 'fr-FR';
+            uttr.rate = 0.85;
+            const frVoice = voices.find(v => v.lang.includes('fr'));
+            if (frVoice) uttr.voice = frVoice;
+            synth.speak(uttr);
+            lastSpokenText = text;
+        } catch (e) { console.warn("Speech error:", e); }
+    }
+
+    function replayAudio() { if (lastSpokenText) speakFrench(lastSpokenText); }
+
+    function saveResult(cat, isCorrect) {
+        try {
+            if (!history[cat]) history[cat] = { correct: 0, total: 0 };
+            history[cat].total += 1;
+            if (isCorrect) history[cat].correct += 1;
+            localStorage.setItem('fuken_history', JSON.stringify(history));
+        } catch(e) {}
+    }
+
+    function renderStats() {
+        const list = document.getElementById('stats-list');
+        list.innerHTML = "";
+        const categories = ["名詞の性", "動詞の活用", "前置詞・文法", "熟語・表現"];
+        categories.forEach(cat => {
+            const data = history[cat] || { correct: 0, total: 0 };
+            const percent = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+            let colorClass = (percent < 60 && data.total > 0) ? "weak" : "";
+            list.innerHTML += `<div class="stat-row"><div class="stat-label"><span>${cat}</span><span>${percent}%</span></div><div class="bar-bg"><div class="bar-fill ${colorClass}" style="width: ${percent}%"></div></div></div>`;
+        });
+    }
+
+    function clearHistory() {
+        if (confirm("履歴をリセットしますか？")) {
+            localStorage.removeItem('fuken_history'); 
+            history = {}; 
+            renderStats();
+        }
+    }
+
+    // データの安全なロードとエラー表示
+    async function loadData() {
+        try {
+            const response = await fetch('questions.json?t=' + Date.now());
+            if (!response.ok) throw new Error("JSONファイルの読み込みに失敗しました。");
+            
+            database = await response.json();
+            
+            renderStats();
+            document.getElementById('loading-screen').classList.remove('active');
+            document.getElementById('menu-screen').classList.add('active');
+            loadVoices();
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('loading-screen').innerHTML = `
+                <h1 style="color:var(--rouge); font-size:1.2rem;">エラーが発生しました</h1>
+                <p style="color:var(--text-light); font-size:0.9rem; line-height:1.5; margin-top:1rem;">
+                JSONデータが正しく読み込めません。<br>
+                カンマ(,)の抜けなど、文法エラーがないか確認してください。<br><br>
+                詳細: ${e.message}
+                </p>`;
+        }
+    }
+
+    function startQuiz(lvl, mode) {
+        initSpeech();
+        currentMode = mode;
+        let filtered = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
+        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
+        if (currentQuestions.length === 0) return alert("問題がありません");
+        currentIndex = 0; score = 0;
+        switchScreen('quiz-screen');
+        showQuestion();
+    }
+
+    function getCategory(q) {
+        if (q.category) return q.category;
+        if (q.type === 'gender') return "名詞の性";
+        return "前置詞・文法";
+    }
+
+    function getDefArticle(word, gender) {
+        if (!word || word.length === 0) return "";
+        const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ù'];
+        if (vowels.includes(word[0].toLowerCase())) return "l'";
+        return (gender === "男性") ? "le " : "la ";
+    }
+
+    function showQuestion() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById('level-tag').textContent = q.level;
+        document.getElementById('current-count').textContent = currentIndex + 1;
+        document.getElementById('question-display').textContent = q.type === 'gender' ? q.word : q.word_or_question;
+        document.getElementById('meaning-display').textContent = q.meaning;
+        document.getElementById('feedback').textContent = "";
+        document.getElementById('feedback-area').style.display = "none";
+        
+        const choicesDiv = document.getElementById('choices-container');
+        const typingDiv = document.getElementById('typing-container');
+        const input = document.getElementById('typing-input');
+
+        if (currentMode === 'choice') {
+            choicesDiv.style.display = 'grid';
+            typingDiv.style.display = 'none';
+            choicesDiv.innerHTML = "";
+            const choices = q.type === 'gender' ? ["男性 (le)", "女性 (la)"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
+            
+            choices.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                btn.textContent = c;
+                btn.onclick = () => {
+                    if (q.type === 'gender') {
+                        check(c.split(" ")[0]);
+                    } else {
+                        check(c);
+                    }
+                };
+                choicesDiv.appendChild(btn);
+            });
+        } else {
+            choicesDiv.style.display = 'none';
+            typingDiv.style.display = 'block';
+            input.value = ""; input.disabled = false;
+            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
+            setTimeout(() => input.focus(), 100);
+        }
+    }
+
+    document.getElementById('typing-input').onkeypress = function(e) {
+        if (e.key === 'Enter' && this.value.trim() !== "") {
+            this.disabled = true;
+            check(this.value.trim());
+        }
+    };
+
+    function check(userAns) {
+        const q = currentQuestions[currentIndex];
+        let input = String(userAns).toLowerCase().trim();
+        let correctAns = String(q.answer).toLowerCase();
+        let isCorrect = false;
+        let defArt = "";
+
+        if (q.type === 'gender') {
+            defArt = getDefArticle(q.word, q.answer).trim();
+            if (currentMode === 'typing') {
+                if (input === defArt || input === defArt.replace("'","") || input === correctAns) isCorrect = true;
+            } else {
+                if (userAns === q.answer) isCorrect = true;
+            }
+        } else {
+            isCorrect = (input === correctAns);
+        }
+
+        saveResult(getCategory(q), isCorrect);
+
+        const fb = document.getElementById('feedback');
+        let displayAns = q.answer;
+        if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
+        
+        fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
+        fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
+        if (isCorrect) score++;
+
+        let textToSpeak = "";
+        if (q.type === 'gender') {
+            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
+        } else {
+            textToSpeak = q.word_or_question.replace(/\(\s*\)/, q.answer);
+        }
+        speakFrench(textToSpeak);
+
+        document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
+        document.getElementById('feedback-area').style.display = "block";
+        document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
+        if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
+    }
+
+    function handleNext() {
+        currentIndex++;
+        if (currentIndex < currentQuestions.length) showQuestion();
+        else showResult();
+    }
+
+    function showResult() {
+        switchScreen('result-screen');
+        document.getElementById('final-score').textContent = score + " / 10";
+        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
+    }
+
+    function switchScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    loadData();
+</script>
+</body>
+</html>
