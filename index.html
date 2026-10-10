@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仏検対策：フラ単 Pro</title>
+    <title>仏検対策</title>
     <style>
         /* 洗練されたフレンチモダン・カラー */
         :root { 
@@ -97,7 +97,7 @@
         /* タイピング入力 */
         #typing-input { 
             width: 90%; padding: 14px; font-size: 1.1rem; border: 1px solid var(--bleu); border-radius: 12px; 
-            text-align: center; outline: none; color: var(--text-main); background: #fff;
+            text-align: center; outline: none; color: var(--text-main); background: #fff; margin: 0 auto; display: block;
         }
 
         /* フィードバック・解説 */
@@ -152,8 +152,8 @@
                 <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
                 <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
             </div>
-            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス (4択)</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング (le/la/l')</button>
+            <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング</button>
         </div>
     </div>
 
@@ -194,11 +194,9 @@
     let currentMode = 'choice';
     let lastSpokenText = "";
     
-    // Web Speech API の安全な初期化
     let synth = window.speechSynthesis || null;
     let voices = [];
 
-    // ローカルストレージの安全な読み込み（フリーズ対策）
     let history = {};
     try {
         const saved = localStorage.getItem('fuken_history');
@@ -206,7 +204,6 @@
             history = JSON.parse(saved);
         }
     } catch (e) {
-        console.warn("History parse error:", e);
         history = {};
     }
 
@@ -272,11 +269,10 @@
         }
     }
 
-    // データの安全なロードとエラー表示
     async function loadData() {
         try {
             const response = await fetch('questions.json?t=' + Date.now());
-            if (!response.ok) throw new Error("JSONファイルの読み込みに失敗しました。");
+            if (!response.ok) throw new Error("JSON読み込み失敗");
             
             database = await response.json();
             
@@ -285,14 +281,9 @@
             document.getElementById('menu-screen').classList.add('active');
             loadVoices();
         } catch (e) { 
-            console.error(e);
             document.getElementById('loading-screen').innerHTML = `
                 <h1 style="color:var(--rouge); font-size:1.2rem;">エラーが発生しました</h1>
-                <p style="color:var(--text-light); font-size:0.9rem; line-height:1.5; margin-top:1rem;">
-                JSONデータが正しく読み込めません。<br>
-                カンマ(,)の抜けなど、文法エラーがないか確認してください。<br><br>
-                詳細: ${e.message}
-                </p>`;
+                <p style="color:var(--text-light); font-size:0.9rem;">JSONデータを確認してください。</p>`;
         }
     }
 
@@ -355,7 +346,11 @@
         } else {
             choicesDiv.style.display = 'none';
             typingDiv.style.display = 'block';
-            input.value = ""; input.disabled = false;
+            
+            // バグ修正：入力欄のdisplayをblockに戻す
+            input.style.display = 'block'; 
+            input.value = ""; 
+            input.disabled = false;
             input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
             setTimeout(() => input.focus(), 100);
         }
@@ -407,6 +402,8 @@
         document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
         document.getElementById('feedback-area').style.display = "block";
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
+        
+        // タイピングモードの時だけ入力欄を隠す（2問目以降で復活させる処理はshowQuestionで対応済）
         if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
     }
 
