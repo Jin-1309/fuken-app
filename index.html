@@ -200,8 +200,6 @@
 
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
-        
-        <!-- 問題・意味の表示部分 -->
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
         
@@ -237,17 +235,51 @@
     let currentMode = 'choice';
     let lastSpokenText = "";
     let quizConfig = { lvl: 'ALL', mode: 'choice', targetCategory: 'ALL' };
+    
+    // --- 音声関連の初期化 ---
     let synth = window.speechSynthesis || null;
     let voices = [];
-    let history = {};
-    let answeredQuestions = [];
-    let wrongQuestions = []; 
+    
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
 
-    try {
-        if (localStorage.getItem('fuken_history')) history = JSON.parse(localStorage.getItem('fuken_history'));
-        if (localStorage.getItem('fuken_answered')) answeredQuestions = JSON.parse(localStorage.getItem('fuken_answered'));
-        if (localStorage.getItem('fuken_wrong')) wrongQuestions = JSON.parse(localStorage.getItem('fuken_wrong'));
-    } catch (e) { history = {}; answeredQuestions = []; wrongQuestions = []; }
+    // 電子音（ピコーン/ブブー）の初期化
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // 正誤の電子音を鳴らす関数
+    function playBeepSound(isCorrect) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        if (isCorrect) {
+            // 正解音（ピコーン）
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // ラ
+            osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.1); // ミ
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else {
+            // 不正解音（ブブー）
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime); // 低いラ
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
 
     function initSpeech() {
         if (!synth) return;
@@ -276,6 +308,16 @@
     }
 
     function replayAudio() { if (lastSpokenText) speakFrench(lastSpokenText); }
+
+    let history = {};
+    let answeredQuestions = [];
+    let wrongQuestions = []; 
+
+    try {
+        if (localStorage.getItem('fuken_history')) history = JSON.parse(localStorage.getItem('fuken_history'));
+        if (localStorage.getItem('fuken_answered')) answeredQuestions = JSON.parse(localStorage.getItem('fuken_answered'));
+        if (localStorage.getItem('fuken_wrong')) wrongQuestions = JSON.parse(localStorage.getItem('fuken_wrong'));
+    } catch (e) { history = {}; answeredQuestions = []; wrongQuestions = []; }
 
     function saveResult(cat, isCorrect) {
         try {
@@ -356,6 +398,7 @@
 
     function startQuiz(lvl, mode, targetCategory = 'ALL') {
         initSpeech();
+        initAudioContext(); // ユーザーのクリックで電子音のエンジンを初期化
         quizConfig = { lvl, mode, targetCategory };
         
         let filtered = database;
@@ -419,7 +462,6 @@
         document.getElementById('level-tag').textContent = q.level;
         document.getElementById('current-count').textContent = currentIndex + 1;
         
-        // ★【修正】問題文と意味を、改行対応（innerHTML）にする
         let qText = q.type === 'gender' ? (q.word || q.word_or_question) : q.word_or_question;
         document.getElementById('question-display').innerHTML = qText.replace(/\\n|\n/g, '<br>');
         document.getElementById('meaning-display').innerHTML = (q.meaning || "").replace(/\\n|\n/g, '<br>');
@@ -508,8 +550,13 @@
         
         fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
         fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
+        
         if (isCorrect) score++;
 
+        // ★ここで正誤の電子音（ピコーン/ブブー）を鳴らします
+        playBeepSound(isCorrect);
+
+        // その後、フランス語の読み上げを開始します
         let textToSpeak = "";
         if (q.type === 'gender') {
             textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + (q.word || q.word_or_question);
@@ -520,12 +567,9 @@
                 textToSpeak = textToSpeak.replace(/\(\s*\)/, ans);
             });
         }
-        
-        // ★【修正】読み上げテキストから改行タグを除去し、アポストロフィを正規化
         textToSpeak = textToSpeak.replace(/\\n|\n/g, ' ').replace(/’/g, "'");
         speakFrench(textToSpeak);
 
-        // ★【修正】解説も改行対応にする
         document.getElementById('commentary-text').innerHTML = (q.comment || "Pas de commentaire.").replace(/\\n|\n/g, '<br>');
         
         const nextBtn = document.getElementById('next-btn');
