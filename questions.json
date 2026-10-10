@@ -1,103 +1,88 @@
 [
-level,type,word_or_question,meaning,choice1,choice2,choice3,choice4,answer
-5級,gender,Gâteau,ケーキ,男性,女性,,,男性
-5級,gender,Chaise,椅子,男性,女性,,,女性
-5級,gender,Journal,新聞,男性,女性,,,男性
-5級,gender,Fleur,花,男性,女性,,,女性
-5級,gender,Chien,犬,男性,女性,,,男性
-5級,gender,Montre,腕時計,男性,女性,,,女性
-5級,gender,Pain,パン,男性,女性,,,男性
-5級,gender,Lait,牛乳,男性,女性,,,男性
-5級,gender,Eau,水,男性,女性,,,女性
-5級,gender,Mer,海,男性,女性,,,女性
-4級,gender,Musée,美術館,男性,女性,,,男性
-4級,gender,Lycée,高校,男性,女性,,,男性
-4級,gender,Forêt,森,男性,女性,,,女性
-4級,gender,Saison,季節,男性,女性,,,女性
-4級,gender,Voyage,旅行,男性,女性,,,男性
-4級,gender,Valise,スーツケース,男性,女性,,,女性
-4級,gender,Village,村,男性,女性,,,男性
-4級,gender,Photo,写真,男性,女性,,,女性
-4級,gender,Plage,海岸,男性,女性,,,女性
-4級,gender,Île,島,男性,女性,,,女性
-3級,gender,Problème,問題,男性,女性,,,男性
-3級,gender,Système,体系,男性,女性,,,男性
-3級,gender,Silence,沈黙,男性,女性,,,男性
-3級,gender,Paix,平和,男性,女性,,,女性
-3級,gender,Liberté,自由,男性,女性,,,女性
-3級,gender,Gouvernement,政府,男性,女性,,,男性
-3級,gender,Éducation,教育,男性,女性,,,女性
-3級,gender,Attention,注意,男性,女性,,,女性
-3級,gender,Amour,愛,男性,女性,,,男性
-3級,gender,Ciel,空,男性,女性,,,男性
-5級,cloze,Je (   ) japonais.,私は日本人です。,suis,es,est,sommes,suis
-5級,cloze,Tu (   ) quel âge ?,君は何歳？,es,as,est,a,as
-5級,cloze,Il (   ) chaud.,（天気が）暑い。,est,fait,a,va,fait
-5級,cloze,Comment (   )-vous ?,お元気ですか？,allez,êtes,faites,avez,allez
-5級,cloze,Nous (   ) au cinéma.,私たちは映画館に行きます。,allons,sommes,allons,vont,allons
-5級,cloze,Il y (   ) un livre.,本が1冊あります。,est,a,fait,va,a
-5級,cloze,J'habite (   ) Tokyo.,私は東京に住んでいます。,à,en,au,aux,à
-5級,cloze,Il est (   ) heures.,10時です。,dix,dizième,dixi,dis,dix
-5級,cloze,C'est (   ) pomme.,これはリンゴです。,un,une,le,la,une
-5級,cloze,Donnez-moi (   ) café.,コーヒーをください。,un,une,des,le,un
-4級,cloze,Je vais (   ) France.,私はフランスへ行きます。,à,en,au,aux,en
-4級,cloze,Il va (   ) Japon.,彼は日本へ行きます。,à,en,au,aux,au
-4級,cloze,Je ne mange (   ) de viande.,私は肉を食べません。,pas,plus,jamais,rien,pas
-4級,cloze,Elle est plus grande (   ) moi.,彼女は私より背が高い。,que,de,comme,si,que
-4級,cloze,J'ai (   ) de mon portable.,携帯電話をなくした。,perdu,perd,perdre,perdis,perdu
-4級,cloze,C'est le stylo (   ) Marie.,これはマリーのペンです。,de,à,du,des,de
-4級,cloze,Il pleut (   ).,とても雨が降っている。,beaucoup,très,bien,souvent,beaucoup
-4級,cloze,Il (   ) pleuvoir.,雨が降りそうだ（近接未来）。,va,vient,est,fait,va
-4級,cloze,Je (   ) de manger.,食べたばかりだ（近接過去）。,vais,viens,viens,suis,viens
-4級,cloze,Elle est (   ) à Paris.,彼女はパリへ行った。,allé,allée,allés,allées,allée
-3級,cloze,J'ai (   ) de travailler.,働く必要がある。,envie,besoin,peur,honte,besoin
-3級,cloze,Il a (   ) de rater l'avion.,彼は飛行機に乗り遅れるのを恐れている。,peur,besoin,faim,soif,peur
-3級,cloze,Pense (   ) tes devoirs !,宿題のことを考えなさい！,à,de,sur,pour,à
-3級,cloze,Je m'intéresse (   ) l'art.,私は芸術に興味がある。,à,de,sur,en,à
-3級,cloze,C'est la ville (   ) je suis né.,それは私が生まれた町だ。,où,que,qui,dont,où
-3級,cloze,L'homme (   ) parle est mon père.,話している男は私の父だ。,qui,que,où,dont,qui
-3級,cloze,Le gâteau (   ) j'ai mangé.,私が食べたケーキ。,que,qui,où,dont,que
-3級,cloze,J'en ai (   ).,それを3つ持っています。,trois,le trois,de trois,des trois,trois
-3級,cloze,Il est (   ) de partir.,出発する時間だ。,temps,heure,moment,fois,temps
-3級,cloze,Il (   ) beau demain.,明日は晴れるだろう（単純未来）。,sera,est,faisait,serait,sera
-5級,gender,Maison,家,男性,女性,,,女性
-5級,gender,Livre,本,男性,女性,,,男性
-5級,gender,Table,机,男性,女性,,,女性
-5級,gender,Fenêtre,窓,男性,女性,,,女性
-5級,gender,Porte,ドア,男性,女性,,,女性
-5級,gender,Crayon,鉛筆,男性,女性,,,男性
-5級,gender,Gomme,消しゴム,男性,女性,,,女性
-5級,gender,Classe,教室,男性,女性,,,女性
-5級,gender,Ami,友達（男）,男性,女性,,,男性
-5級,gender,Amie,友達（女）,男性,女性,,,女性
-4級,cloze,Il fait (   ) vent.,風が吹いている。,du,de la,des,le,du
-4級,cloze,Elle (   ) du piano.,彼女はピアノを弾く。,joue,fait,va,est,joue
-4級,cloze,Nous (   ) au foot.,私たちはサッカーをする。,jouons,faisons,allons,sommes,jouons
-4級,cloze,On (   ) en bus.,バスで行こう。,va,vont,allez,allons,va
-4級,cloze,C'est (   ) idée.,それはいい考えだ。,une bonne,un bon,bon,bonne,une bonne
-4級,cloze,Je (   ) le chercher.,彼を迎えに行くつもりだ。,vais,viens,suis,fais,vais
-4級,cloze,Est-ce (   ) tu comprends ?,理解している？,que,qui,qu',dont,que
-4級,cloze,Il n'y a (   ) personne.,誰もいない。,plus,pas,rien,que,plus
-4級,cloze,Regarde-(   ) !,私を見て！,moi,me,je,ma,moi
-4級,cloze,Réponds-(   ) !,彼に答えなさい！,lui,le,il,la,lui
-3級,cloze,Je (   ) connais pas.,彼（彼女）らを知らない。,les,leur,en,y,les
-3級,cloze,Je (   ) ai donné un cadeau.,彼（彼女）にプレゼントをあげた。,lui,le,la,en,lui
-3級,cloze,Il (   ) faut un visa.,ビザが必要だ（非人称）。,faut,doit,peut,veut,faut
-3級,cloze,Il est possible (   ) venir.,来ることが可能だ。,de,à,que,pour,de
-3級,cloze,Je suis heureux (   ) vous voir.,お会いできて嬉しい。,de,à,que,par,de
-3級,cloze,Avant de (   ), il a mangé.,寝る前に彼は食べた。,dormir,dort,dormi,dors,dormir
-3級,cloze,En (   ) la rue, j'ai vu Paul.,通りを歩きながらポールに会った。,marchant,marcher,marché,marche,marchant
-3級,cloze,Si j'avais le temps, je (   ).,時間があれば行くのに（条件法）。,irais,vais,irai,allais,irais
-3級,cloze,Il (   ) pleuvait hier.,昨日雨が降っていた（半過去）。,pleuvait,pleut,plu,pleuvra,pleuvait
-3級,cloze,C'est le plus (   ) film.,これは最も素晴らしい映画だ。,beau,bien,bon,mieux,beau
-5級,gender,Chat,猫,男性,女性,,,男性
-5級,gender,Chien,犬,男性,女性,,,男性
-5級,gender,Oiseau,鳥,男性,女性,,,男性
-5級,gender,Poisson,魚,男性,女性,,,男性
-5級,gender,Arbre,木,男性,女性,,,男性
-4級,gender,Cuisine,料理,男性,女性,,,女性
-4級,gender,Chambre,部屋,男性,女性,,,女性
-3級,gender,Liberté,自由,男性,女性,,,女性
-3級,gender,Égalité,平等,男性,女性,,,女性
-3級,gender,Fraternité,友愛,男性,女性,,,女性
+  {
+    "level": "5級",
+    "type": "gender",
+    "word": "Gâteau",
+    "meaning": "ケーキ",
+    "answer": "男性"
+  },
+  {
+    "level": "5級",
+    "type": "gender",
+    "word": "Chaise",
+    "meaning": "椅子",
+    "answer": "女性"
+  },
+  {
+    "level": "5級",
+    "type": "cloze",
+    "word_or_question": "Je (   ) japonais.",
+    "meaning": "私は日本人です。",
+    "choice1": "suis",
+    "choice2": "es",
+    "choice3": "est",
+    "choice4": "sommes",
+    "answer": "suis"
+  },
+  {
+    "level": "4級",
+    "type": "gender",
+    "word": "Musée",
+    "meaning": "美術館",
+    "answer": "男性"
+  },
+  {
+    "level": "4級",
+    "type": "gender",
+    "word": "Forêt",
+    "meaning": "森",
+    "answer": "女性"
+  },
+  {
+    "level": "4級",
+    "type": "cloze",
+    "word_or_question": "Je vais (   ) France.",
+    "meaning": "私はフランスへ行きます。",
+    "choice1": "à",
+    "choice2": "en",
+    "choice3": "au",
+    "choice4": "aux",
+    "answer": "en"
+  },
+  {
+    "level": "3級",
+    "type": "gender",
+    "word": "Problème",
+    "meaning": "問題",
+    "answer": "男性"
+  },
+  {
+    "level": "3級",
+    "type": "gender",
+    "word": "Liberté",
+    "meaning": "自由",
+    "answer": "女性"
+  },
+  {
+    "level": "3級",
+    "type": "cloze",
+    "word_or_question": "J'ai (   ) de travailler.",
+    "meaning": "働く必要がある。",
+    "choice1": "envie",
+    "choice2": "besoin",
+    "choice3": "peur",
+    "choice4": "honte",
+    "answer": "besoin"
+  },
+  {
+    "level": "3級",
+    "type": "cloze",
+    "word_or_question": "Il (   ) beau demain.",
+    "meaning": "明日は晴れるだろう（単純未来）。",
+    "choice1": "sera",
+    "choice2": "est",
+    "choice3": "faisait",
+    "choice4": "serait",
+    "answer": "sera"
+  }
 ]
