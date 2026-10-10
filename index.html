@@ -18,11 +18,8 @@
         .meaning { color: #666; margin-bottom: 1rem; font-size: 0.9rem; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         #typing-input { width: 85%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 10px; text-align: center; }
-        
-        /* 解説エリアのスタイル */
         #commentary-box { display: none; background: #fffde7; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; font-size: 0.9rem; color: #5d4037; line-height: 1.4; }
         #next-btn { display: none; background: var(--primary); color: white; border: none; margin-top: 15px; }
-
         button:disabled { opacity: 0.6; }
         #feedback { margin-top: 1rem; font-weight: bold; font-size: 1.2rem; }
         .progress { margin-top: 1rem; color: #888; font-size: 0.8rem; }
@@ -35,16 +32,13 @@
 
     <div id="menu-screen" class="screen">
         <h1>仏検対策ドリル</h1>
-        <div class="menu-grid">
-            <p>【4択モード】</p>
-            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級レベル</button>
-            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級レベル</button>
-            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級レベル</button>
-            <button class="menu-btn" style="background:#fff3e0;" onclick="startQuiz('2級', 'choice')">2級レベル</button>
-            <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全級ミックス</button>
-            <hr>
-            <p>【タイピングモード】</p>
-            <button class="menu-btn special-btn" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピングチャレンジ</button>
+        <div style="display:flex; flex-direction:column;">
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
+            <button class="menu-btn" style="background:#eef;" onclick="startQuiz('ALL', 'choice')">全ミックス (4択)</button>
+            <button class="menu-btn" style="border:2px dashed #ccc;" onclick="startQuiz('ALL', 'typing')">⌨️ タイピング挑戦</button>
         </div>
     </div>
 
@@ -52,22 +46,13 @@
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
-        
         <div id="choices-container" class="grid-choices"></div>
         <div id="typing-container" style="display:none;">
             <input type="text" id="typing-input" placeholder="入力..." autocomplete="off">
         </div>
-
         <div id="feedback"></div>
-
-        <!-- 解説エリア -->
-        <div id="commentary-box">
-            <strong>💡 解説:</strong> <span id="commentary-text"></span>
-        </div>
-
-        <!-- 次へボタン -->
+        <div id="commentary-box"><strong>💡 解説:</strong> <span id="commentary-text"></span></div>
         <button id="next-btn" class="menu-btn" onclick="handleNext()">次へ進む</button>
-
         <div class="progress">問題: <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
@@ -85,15 +70,24 @@
     let score = 0;
     let currentMode = 'choice';
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(isCorrect) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(isCorrect ? 880 : 220, audioCtx.currentTime);
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-        osc.stop(audioCtx.currentTime + 0.5);
+    // --- 音声読み上げ機能 ---
+    function speakFrench(text) {
+        if (!('speechSynthesis' in window)) return;
+        
+        // すでに喋っている場合は止める
+        window.speechSynthesis.cancel();
+
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.lang = 'fr-FR'; // フランス語に設定
+        uttr.rate = 0.9;     // 少しゆっくりめ
+        uttr.pitch = 1.0;
+        
+        // ブラウザからフランス語の声を探す
+        const voices = window.speechSynthesis.getVoices();
+        const frVoice = voices.find(v => v.lang.startsWith('fr'));
+        if (frVoice) uttr.voice = frVoice;
+
+        window.speechSynthesis.speak(uttr);
     }
 
     async function loadData() {
@@ -149,7 +143,6 @@
         }
     }
 
-    // タイピング入力イベント
     document.getElementById('typing-input').onkeypress = function(e) {
         if (e.key === 'Enter' && this.value.trim() !== "") {
             this.disabled = true;
@@ -163,28 +156,35 @@
         let input = userAns.toLowerCase();
         let isCorrect = false;
 
-        // 判定ロジック
         if (currentMode === 'typing' && q.type === 'gender') {
             if ((correctAns === "男性" && input === "un") || (correctAns === "女性" && input === "une") || input === correctAns) isCorrect = true;
         } else {
             isCorrect = (input === correctAns);
         }
 
-        // フィードバック表示
         const fb = document.getElementById('feedback');
         fb.textContent = isCorrect ? "C'est bien ! 正解" : "残念... 正解は " + (q.type === 'gender' ? (q.answer === "男性" ? "un" : "une") : q.answer);
         fb.style.color = isCorrect ? "#4CAF50" : "#EF4135";
         
-        if (isCorrect) score++;
-        playSound(isCorrect);
+        if (isCorrect) {
+            score++;
+            // --- 正解時に読み上げを実行 ---
+            let textToSpeak = "";
+            if (q.type === 'gender') {
+                // 性別問題なら冠詞をつけて読む
+                textToSpeak = (q.answer === "男性" ? "un " : "une ") + q.word;
+            } else {
+                // 文章問題ならカッコを正解で埋めて読む
+                textToSpeak = q.word_or_question.replace("(   )", q.answer);
+            }
+            speakFrench(textToSpeak);
+        }
 
-        // 解説の表示
         if (q.comment) {
             document.getElementById('commentary-text').textContent = q.comment;
             document.getElementById('commentary-box').style.display = "block";
         }
 
-        // ボタン制御
         document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
         document.getElementById('next-btn').style.display = "block";
     }
