@@ -37,12 +37,10 @@
             width: 90%; 
             max-width: 400px; 
             text-align: center; 
-            /* スマホでボタンが増えてもスクロールできるようにする */
             max-height: 90vh;
             overflow-y: auto;
         }
         
-        /* スクロールバーを少し目立たなくする */
         #app-container::-webkit-scrollbar { width: 6px; }
         #app-container::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 3px; }
 
@@ -165,12 +163,12 @@
 
         <div class="section-title">📘 級別で学ぶ</div>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
-            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
-            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
-            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
-            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級</button>
-            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級</button>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級 (4択)</button>
         </div>
 
         <div class="section-title">📂 カテゴリー集中特訓 (全級)</div>
@@ -184,7 +182,7 @@
         <div class="section-title">🎯 総合テスト</div>
         <div style="display:flex; flex-direction:column; gap:10px;">
             <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級・全ジャンル ミックス</button>
-            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング</button>
+            <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング挑戦</button>
         </div>
     </div>
 
@@ -321,7 +319,6 @@
         return "前置詞・文法";
     }
 
-    // 【修正ポイント】カテゴリーを指定してクイズを開始できるように引数を追加
     function startQuiz(lvl, mode, targetCategory = 'ALL') {
         initSpeech();
         currentMode = mode;
@@ -332,15 +329,13 @@
             filtered = filtered.filter(q => q.level === lvl);
         }
 
-        // カテゴリーによる絞り込み（新機能）
+        // カテゴリーによる絞り込み
         if (targetCategory !== 'ALL') {
             filtered = filtered.filter(q => getCategory(q) === targetCategory);
         }
 
-        // タイピングは名詞の性のみに限定
-        if (mode === 'typing') {
-            filtered = filtered.filter(q => q.type === 'gender');
-        }
+        // 【修正】タイピングモードで全問題を出題するようにフィルターを削除しました
+        // （以前ここにあった q.type === 'gender' のフィルターを削除）
 
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
         
@@ -377,7 +372,6 @@
             choicesDiv.style.display = 'grid';
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
-            // 【修正】"(le)"などを消し、「男性」「女性」だけのシンプルな表示に変更
             const choices = q.type === 'gender' ? ["男性", "女性"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
             
             choices.forEach(c => {
@@ -396,7 +390,8 @@
             input.style.display = 'block'; 
             input.value = ""; 
             input.disabled = false;
-            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力";
+            // プレースホルダーを問題タイプに合わせて変更
+            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
             setTimeout(() => input.focus(), 100);
         }
     }
