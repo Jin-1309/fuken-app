@@ -172,7 +172,7 @@
         <div id="feedback-area">
             <div id="commentary-box"><span id="commentary-text"></span></div>
             <button id="audio-repeat-btn" onclick="replayAudio()">🔊</button>
-            <button class="menu-btn btn-mix" onclick="handleNext()">Suivant (次へ)</button>
+            <button id="next-btn" class="menu-btn btn-mix" onclick="handleNext()">Suivant (次へ)</button>
         </div>
 
         <div class="progress">Question <span id="current-count">0</span> / 10</div>
@@ -290,9 +290,14 @@
     function startQuiz(lvl, mode) {
         initSpeech();
         currentMode = mode;
-        let filtered = (lvl === 'ALL') ? [...database] : database.filter(q => q.level === lvl);
+        let filtered = database;
+
+        // 【修正】レベルとモードによる絞り込みを明確化
+        if (lvl !== 'ALL') filtered = filtered.filter(q => q.level === lvl);
+        if (mode === 'typing') filtered = filtered.filter(q => q.type === 'gender'); // タイピングは名詞の性（le/la/l'）のみにする
+
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        if (currentQuestions.length === 0) return alert("問題がありません");
+        if (currentQuestions.length === 0) return alert("該当する問題がありません");
         currentIndex = 0; score = 0;
         switchScreen('quiz-screen');
         showQuestion();
@@ -328,103 +333,4 @@
             choicesDiv.style.display = 'grid';
             typingDiv.style.display = 'none';
             choicesDiv.innerHTML = "";
-            const choices = q.type === 'gender' ? ["男性 (le)", "女性 (la)"] : [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== "");
-            
-            choices.forEach(c => {
-                const btn = document.createElement('button');
-                btn.className = 'menu-btn';
-                btn.textContent = c;
-                btn.onclick = () => {
-                    if (q.type === 'gender') {
-                        check(c.split(" ")[0]);
-                    } else {
-                        check(c);
-                    }
-                };
-                choicesDiv.appendChild(btn);
-            });
-        } else {
-            choicesDiv.style.display = 'none';
-            typingDiv.style.display = 'block';
-            
-            // バグ修正：入力欄のdisplayをblockに戻す
-            input.style.display = 'block'; 
-            input.value = ""; 
-            input.disabled = false;
-            input.placeholder = (q.type === 'gender') ? "le / la / l'" : "Réponse...";
-            setTimeout(() => input.focus(), 100);
-        }
-    }
-
-    document.getElementById('typing-input').onkeypress = function(e) {
-        if (e.key === 'Enter' && this.value.trim() !== "") {
-            this.disabled = true;
-            check(this.value.trim());
-        }
-    };
-
-    function check(userAns) {
-        const q = currentQuestions[currentIndex];
-        let input = String(userAns).toLowerCase().trim();
-        let correctAns = String(q.answer).toLowerCase();
-        let isCorrect = false;
-        let defArt = "";
-
-        if (q.type === 'gender') {
-            defArt = getDefArticle(q.word, q.answer).trim();
-            if (currentMode === 'typing') {
-                if (input === defArt || input === defArt.replace("'","") || input === correctAns) isCorrect = true;
-            } else {
-                if (userAns === q.answer) isCorrect = true;
-            }
-        } else {
-            isCorrect = (input === correctAns);
-        }
-
-        saveResult(getCategory(q), isCorrect);
-
-        const fb = document.getElementById('feedback');
-        let displayAns = q.answer;
-        if (q.type === 'gender') displayAns = defArt + (defArt.endsWith("'") ? "" : " ") + "(" + q.answer + ")";
-        
-        fb.textContent = isCorrect ? "Excellent !" : "正解 : " + displayAns;
-        fb.style.color = isCorrect ? "var(--bleu)" : "var(--rouge)";
-        if (isCorrect) score++;
-
-        let textToSpeak = "";
-        if (q.type === 'gender') {
-            textToSpeak = defArt + (defArt.endsWith("'") ? "" : " ") + q.word;
-        } else {
-            textToSpeak = q.word_or_question.replace(/\(\s*\)/, q.answer);
-        }
-        speakFrench(textToSpeak);
-
-        document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
-        document.getElementById('feedback-area').style.display = "block";
-        document.querySelectorAll('#choices-container button').forEach(b => b.disabled = true);
-        
-        // タイピングモードの時だけ入力欄を隠す（2問目以降で復活させる処理はshowQuestionで対応済）
-        if(currentMode === 'typing') document.getElementById('typing-input').style.display = 'none';
-    }
-
-    function handleNext() {
-        currentIndex++;
-        if (currentIndex < currentQuestions.length) showQuestion();
-        else showResult();
-    }
-
-    function showResult() {
-        switchScreen('result-screen');
-        document.getElementById('final-score').textContent = score + " / 10";
-        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
-    }
-
-    function switchScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    loadData();
-</script>
-</body>
-</html>
+            const choices = q
