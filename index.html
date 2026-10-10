@@ -48,7 +48,7 @@
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-main); letter-spacing: 0.5px; }
+        h1 { font-weight: 700; font-size: 1.4rem; margin-bottom: 2rem; color: var(--text-main); letter-spacing: 0.5px; }
 
         /* バッジ */
         .level-badge { 
@@ -78,7 +78,7 @@
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .menu-btn { 
             width: 100%; 
-            padding: 14px; 
+            padding: 16px; 
             border: 1px solid transparent; 
             border-radius: 12px; 
             cursor: pointer; 
@@ -93,9 +93,9 @@
             color: var(--bleu);
             background: #F0F7FF;
         }
-        .btn-mix { background: var(--bleu); color: var(--blanc); font-weight: 600; }
+        .btn-mix { background: var(--bleu); color: var(--blanc); font-weight: 600; margin-top: 8px; }
         .btn-mix:hover:not(:disabled) { background: #004488; color: var(--blanc); }
-        .btn-typing { border: 1px dashed var(--text-light); background: transparent; color: var(--text-main); }
+        .btn-typing { border: 1px dashed var(--text-light); background: transparent; color: var(--text-main); margin-top: 8px;}
 
         /* 分析エリア */
         .stats-card { margin-bottom: 1rem; text-align: left; }
@@ -143,7 +143,7 @@
 
         .progress { margin-top: 2rem; color: var(--text-light); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.5px; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 10px; width: 100%; text-align: center; transition: 0.2s; }
+        .clear-btn { background: none; border: none; color: var(--text-light); font-size: 0.75rem; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; transition: 0.2s; }
         .clear-btn:hover { color: var(--rouge); }
     </style>
 </head>
@@ -154,21 +154,22 @@
         <h1 style="color:var(--text-light)">Chargement...</h1>
     </div>
 
+    <!-- メニュー画面 -->
     <div id="menu-screen" class="screen">
         <h1>仏検対策ドリル</h1>
         <div class="stats-card">
             <div id="stats-list"></div>
-            <button class="clear-btn" onclick="clearHistory()">学習履歴リセット</button>
+            <button class="clear-btn" onclick="clearHistory()">学習履歴・未学習リストをリセット</button>
         </div>
 
         <div class="section-title">📘 級別で学ぶ</div>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級</button>
-            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級</button>
-            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級</button>
-            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級</button>
-            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級</button>
-            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級</button>
+            <button class="menu-btn" onclick="startQuiz('5級', 'choice')">5級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('4級', 'choice')">4級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('3級', 'choice')">3級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('2級', 'choice')">2級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('準1級', 'choice')">準1級 (4択)</button>
+            <button class="menu-btn" onclick="startQuiz('1級', 'choice')">1級 (4択)</button>
         </div>
 
         <div class="section-title">📂 カテゴリー集中特訓 (全級)</div>
@@ -180,12 +181,26 @@
         </div>
 
         <div class="section-title">🎯 総合テスト</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; flex-direction:column;">
             <button class="menu-btn btn-mix" onclick="startQuiz('ALL', 'choice')">全級・全ジャンル ミックス</button>
             <button class="menu-btn btn-typing" onclick="startQuiz('ALL', 'typing')">⌨️ 全級タイピング挑戦</button>
         </div>
     </div>
 
+    <!-- 出題範囲（未学習/すべて）選択画面 -->
+    <div id="range-select-screen" class="screen">
+        <h1>出題範囲の選択</h1>
+        <p style="color:var(--text-light); font-size:0.9rem; margin-bottom: 2rem;">どの問題に挑戦しますか？</p>
+        
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <button id="range-unlearned-btn" class="menu-btn btn-mix" onclick="confirmStartQuiz('unlearned')">未学習の問題 (...問)</button>
+            <button id="range-all-btn" class="menu-btn" onclick="confirmStartQuiz('all')">すべての問題 (...問)</button>
+        </div>
+        
+        <button class="clear-btn" style="margin-top:2rem;" onclick="switchScreen('menu-screen')">← メニューに戻る</button>
+    </div>
+
+    <!-- クイズ画面 -->
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
         <div id="question-display" class="question-text"></div>
@@ -204,9 +219,10 @@
             <button id="next-btn" class="menu-btn btn-mix" onclick="handleNext()">Suivant (次へ)</button>
         </div>
 
-        <div class="progress">Question <span id="current-count">0</span> / 10</div>
+        <div class="progress">Question <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
+    <!-- 結果画面 -->
     <div id="result-screen" class="screen">
         <h2 style="color: var(--text-light); font-size: 1rem; font-weight: 500;">Résultat</h2>
         <div style="font-size: 4.5rem; font-weight: 700; color: var(--bleu); margin: 1rem 0;" id="final-score">0</div>
@@ -223,14 +239,25 @@
     let currentMode = 'choice';
     let lastSpokenText = "";
     
+    // クイズ設定を一時保存する変数
+    let quizConfig = { lvl: 'ALL', mode: 'choice', category: 'ALL' };
+    
     let synth = window.speechSynthesis || null;
     let voices = [];
 
+    // 履歴と未学習データを読み込み
     let history = {};
+    let answeredQuestions = [];
     try {
-        const saved = localStorage.getItem('fuken_history');
-        if (saved) history = JSON.parse(saved);
-    } catch (e) { history = {}; }
+        const savedHistory = localStorage.getItem('fuken_history');
+        if (savedHistory) history = JSON.parse(savedHistory);
+        
+        const savedAnswered = localStorage.getItem('fuken_answered');
+        if (savedAnswered) answeredQuestions = JSON.parse(savedAnswered);
+    } catch (e) {
+        history = {};
+        answeredQuestions = [];
+    }
 
     function initSpeech() {
         if (!synth) return;
@@ -288,9 +315,11 @@
     }
 
     function clearHistory() {
-        if (confirm("履歴をリセットしますか？")) {
+        if (confirm("正答率の記録と「未学習」のリストをすべてリセットしますか？")) {
             localStorage.removeItem('fuken_history'); 
+            localStorage.removeItem('fuken_answered'); 
             history = {}; 
+            answeredQuestions = [];
             renderStats();
         }
     }
@@ -319,31 +348,63 @@
         return "前置詞・文法";
     }
 
+    // 問題を一意に特定するためのIDを作る関数
+    function getQuestionId(q) {
+        return q.level + "_" + q.type + "_" + (q.word || q.word_or_question);
+    }
+
+    // メニューから呼ばれる（出題範囲選択画面へ）
     function startQuiz(lvl, mode, targetCategory = 'ALL') {
         initSpeech();
-        currentMode = mode;
-        let filtered = database;
-
-        // レベルによる絞り込み
-        if (lvl !== 'ALL') {
-            filtered = filtered.filter(q => q.level === lvl);
-        }
-
-        // カテゴリーによる絞り込み
-        if (targetCategory !== 'ALL') {
-            filtered = filtered.filter(q => getCategory(q) === targetCategory);
-        }
-
-        // 【修正】タイピングモードで全問題を出題するようにフィルターを削除しました
-        // （以前ここにあった q.type === 'gender' のフィルターを削除）
-
-        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
+        quizConfig = { lvl, mode, targetCategory };
         
-        if (currentQuestions.length === 0) {
+        let filtered = database;
+        if (lvl !== 'ALL') filtered = filtered.filter(q => q.level === lvl);
+        if (targetCategory !== 'ALL') filtered = filtered.filter(q => getCategory(q) === targetCategory);
+
+        const totalCount = filtered.length;
+        
+        if (totalCount === 0) {
             return alert("該当する問題がまだ登録されていません。");
         }
+
+        // 未学習の問題を計算
+        const unlearnedFiltered = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q)));
+        const unlearnedCount = unlearnedFiltered.length;
+
+        // ボタンのテキストを更新
+        document.getElementById('range-all-btn').textContent = `すべての問題 (${totalCount}問から)`;
+        const unlearnBtn = document.getElementById('range-unlearned-btn');
+        unlearnBtn.textContent = `未学習の問題 (${unlearnedCount}問から)`;
+        
+        // 未学習が0問ならボタンを押せなくする
+        if (unlearnedCount === 0) {
+            unlearnBtn.disabled = true;
+            unlearnBtn.textContent = `未学習の問題 (すべて学習済み🎉)`;
+        } else {
+            unlearnBtn.disabled = false;
+        }
+
+        switchScreen('range-select-screen');
+    }
+
+    // 出題範囲（未学習 or すべて）を選択してスタート
+    function confirmStartQuiz(range) {
+        currentMode = quizConfig.mode;
+        let filtered = database;
+
+        if (quizConfig.lvl !== 'ALL') filtered = filtered.filter(q => q.level === quizConfig.lvl);
+        if (quizConfig.targetCategory !== 'ALL') filtered = filtered.filter(q => getCategory(q) === quizConfig.targetCategory);
+
+        if (range === 'unlearned') {
+            filtered = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q)));
+        }
+
+        // 最大10問を選ぶ（残りが10問未満ならあるだけ）
+        currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
         
         currentIndex = 0; score = 0;
+        document.getElementById('total-count').textContent = currentQuestions.length;
         switchScreen('quiz-screen');
         showQuestion();
     }
@@ -378,9 +439,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'menu-btn';
                 btn.textContent = c;
-                btn.onclick = () => {
-                    check(c);
-                };
+                btn.onclick = () => check(c);
                 choicesDiv.appendChild(btn);
             });
         } else {
@@ -390,7 +449,6 @@
             input.style.display = 'block'; 
             input.value = ""; 
             input.disabled = false;
-            // プレースホルダーを問題タイプに合わせて変更
             input.placeholder = (q.type === 'gender') ? "le / la / l'" : "答えを入力 (複数の場合は / で区切る)";
             setTimeout(() => input.focus(), 100);
         }
@@ -399,7 +457,7 @@
     document.getElementById('typing-input').onkeypress = function(e) {
         if (e.key === 'Enter' && this.value.trim() !== "") {
             this.disabled = true;
-            this.blur(); // スマホのキーボードを閉じる
+            this.blur(); 
             check(this.value.trim());
         }
     };
@@ -427,6 +485,13 @@
             isCorrect = (input === correctAns);
         }
 
+        // 解答した問題を「学習済み」リストに追加
+        const qId = getQuestionId(q);
+        if (!answeredQuestions.includes(qId)) {
+            answeredQuestions.push(qId);
+            localStorage.setItem('fuken_answered', JSON.stringify(answeredQuestions));
+        }
+
         saveResult(getCategory(q), isCorrect);
 
         const fb = document.getElementById('feedback');
@@ -447,6 +512,7 @@
                 textToSpeak = textToSpeak.replace(/\(\s*\)/, ans);
             });
         }
+        textToSpeak = textToSpeak.replace(/’/g, "'");
         speakFrench(textToSpeak);
 
         document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
@@ -472,8 +538,10 @@
 
     function showResult() {
         switchScreen('result-screen');
-        document.getElementById('final-score').textContent = score + " / 10";
-        document.getElementById('evaluation-msg').textContent = score >= 8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
+        const maxScore = currentQuestions.length;
+        document.getElementById('final-score').textContent = score + " / " + maxScore;
+        const ratio = score / maxScore;
+        document.getElementById('evaluation-msg').textContent = ratio >= 0.8 ? "Très bien ! その調子です。" : "Bon courage ! 復習しましょう。";
     }
 
     function switchScreen(id) {
