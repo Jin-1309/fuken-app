@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仏検対策ドリル</title>
-    <!-- CSVを読み込むための便利ツールを追加 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         /* 洗練されたフレンチモダン・カラー */
@@ -106,8 +105,8 @@
         .bar-fill { background: var(--bleu); height: 100%; width: 0%; transition: width 0.8s ease; }
         .weak { background: var(--rouge) !important; }
 
-        .question-text { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; color: var(--text-main); line-height: 1.4; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; }
-        .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.95rem; }
+        .question-text { font-size: 1.5rem; font-weight: 700; margin: 1rem 0; color: var(--text-main); line-height: 1.5; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; }
+        .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5; }
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         #typing-input { 
@@ -153,7 +152,6 @@
         <p style="color:var(--text-light); font-size: 0.8rem;">データを同期しています</p>
     </div>
 
-    <!-- メニュー画面 -->
     <div id="menu-screen" class="screen">
         <h1>仏検対策ドリル</h1>
         <div class="stats-card">
@@ -189,7 +187,6 @@
         </div>
     </div>
 
-    <!-- 出題範囲選択画面 -->
     <div id="range-select-screen" class="screen">
         <h1>出題範囲の選択</h1>
         <p style="color:var(--text-light); font-size:0.9rem; margin-bottom: 2rem;">どの問題に挑戦しますか？</p>
@@ -201,11 +198,13 @@
         <button class="clear-btn" style="margin-top:2rem; text-decoration:none;" onclick="switchScreen('menu-screen')">← メニューに戻る</button>
     </div>
 
-    <!-- クイズ画面 -->
     <div id="quiz-screen" class="screen">
         <div id="level-tag" class="level-badge"></div>
+        
+        <!-- 問題・意味の表示部分 -->
         <div id="question-display" class="question-text"></div>
         <div id="meaning-display" class="meaning"></div>
+        
         <div id="choices-container" class="grid-choices"></div>
         <div id="typing-container" style="display:none;"><input type="text" id="typing-input" autocomplete="off" spellcheck="false"></div>
         <div id="feedback"></div>
@@ -217,7 +216,6 @@
         <div class="progress">Question <span id="current-count">0</span> / <span id="total-count">10</span></div>
     </div>
 
-    <!-- 結果画面 -->
     <div id="result-screen" class="screen">
         <h2 style="color: var(--text-light); font-size: 1rem; font-weight: 500;">Résultat</h2>
         <div style="font-size: 4.5rem; font-weight: 700; color: var(--bleu); margin: 1rem 0;" id="final-score">0</div>
@@ -228,8 +226,8 @@
 
 <script>
     // ==========================================
-    // ⬇️ ここにステップ2でコピーしたURLを貼り付けます ⬇️
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuzeEcmkxJGKFRuKb3GePTqgmONesfzZQffCn28tcGtjCgz5nvCM2lrx8pAPXb78YFmL4wCfLt-pdg/pub?output=csv";
+    // ⬇️ ここにスプレッドシートのURLを貼り付けます ⬇️
+    const SHEET_CSV_URL = "ここにURLを貼り付けます";
     // ==========================================
 
     let database = [];
@@ -309,7 +307,6 @@
         }
     }
 
-    // ★CSV（スプレッドシート）読み込み機能
     async function loadData() {
         if (SHEET_CSV_URL === "ここにURLを貼り付けます") {
             document.getElementById('loading-screen').innerHTML = `
@@ -319,7 +316,6 @@
         }
 
         try {
-            // キャッシュ防止のためにURLの末尾にタイムスタンプをつける
             const fetchUrl = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
             
             database = await new Promise((resolve, reject) => {
@@ -327,12 +323,8 @@
                     download: true,
                     header: true,
                     skipEmptyLines: true,
-                    complete: function(results) {
-                        resolve(results.data);
-                    },
-                    error: function(err) {
-                        reject(err);
-                    }
+                    complete: function(results) { resolve(results.data); },
+                    error: function(err) { reject(err); }
                 });
             });
             
@@ -371,9 +363,7 @@
         if (targetCategory !== 'ALL') filtered = filtered.filter(q => getCategory(q) === targetCategory);
 
         const totalCount = filtered.length;
-        if (totalCount === 0) {
-            return alert("該当する問題がまだスプレッドシートに登録されていません。");
-        }
+        if (totalCount === 0) return alert("該当する問題がまだスプレッドシートに登録されていません。");
 
         const unlearnedCount = filtered.filter(q => !answeredQuestions.includes(getQuestionId(q))).length;
         const weakCount = filtered.filter(q => wrongQuestions.includes(getQuestionId(q))).length;
@@ -411,7 +401,6 @@
         }
 
         currentQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-        
         currentIndex = 0; score = 0;
         document.getElementById('total-count').textContent = currentQuestions.length;
         switchScreen('quiz-screen');
@@ -429,8 +418,12 @@
         const q = currentQuestions[currentIndex];
         document.getElementById('level-tag').textContent = q.level;
         document.getElementById('current-count').textContent = currentIndex + 1;
-        document.getElementById('question-display').textContent = q.type === 'gender' ? (q.word || q.word_or_question) : q.word_or_question;
-        document.getElementById('meaning-display').textContent = q.meaning;
+        
+        // ★【修正】問題文と意味を、改行対応（innerHTML）にする
+        let qText = q.type === 'gender' ? (q.word || q.word_or_question) : q.word_or_question;
+        document.getElementById('question-display').innerHTML = qText.replace(/\\n|\n/g, '<br>');
+        document.getElementById('meaning-display').innerHTML = (q.meaning || "").replace(/\\n|\n/g, '<br>');
+        
         document.getElementById('feedback').textContent = "";
         document.getElementById('feedback-area').style.display = "none";
         
@@ -448,7 +441,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'menu-btn';
                 btn.textContent = c;
-                btn.onclick = () => check(c);
+                btn.onclick = () => { check(c); };
                 choicesDiv.appendChild(btn);
             });
         } else {
@@ -471,7 +464,6 @@
         const q = currentQuestions[currentIndex];
         let input = String(userAns).toLowerCase().trim().replace(/’/g, "'");
         let correctAns = String(q.answer).toLowerCase().replace(/’/g, "'");
-        
         input = input.replace(/\s*\/\s*/g, '/');
         correctAns = correctAns.replace(/\s*\/\s*/g, '/');
         
@@ -528,10 +520,13 @@
                 textToSpeak = textToSpeak.replace(/\(\s*\)/, ans);
             });
         }
-        textToSpeak = textToSpeak.replace(/’/g, "'");
+        
+        // ★【修正】読み上げテキストから改行タグを除去し、アポストロフィを正規化
+        textToSpeak = textToSpeak.replace(/\\n|\n/g, ' ').replace(/’/g, "'");
         speakFrench(textToSpeak);
 
-        document.getElementById('commentary-text').textContent = q.comment || "Pas de commentaire.";
+        // ★【修正】解説も改行対応にする
+        document.getElementById('commentary-text').innerHTML = (q.comment || "Pas de commentaire.").replace(/\\n|\n/g, '<br>');
         
         const nextBtn = document.getElementById('next-btn');
         if (currentIndex === currentQuestions.length - 1) {
