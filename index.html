@@ -105,8 +105,11 @@
         .bar-fill { background: var(--bleu); height: 100%; width: 0%; transition: width 0.8s ease; }
         .weak { background: var(--rouge) !important; }
 
-        .question-text { font-size: 1.5rem; font-weight: 700; margin: 1rem 0; color: var(--text-main); line-height: 1.5; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; }
-        .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5; }
+        .question-text { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; color: var(--text-main); line-height: 1.4; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; }
+        
+        /* ★修正：意味の表示部分のアニメーション設定 */
+        .meaning { color: var(--text-light); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5; display: none; animation: fadeIn 0.4s ease; }
+        
         .grid-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         #typing-input { 
@@ -370,7 +373,6 @@
         }
     }
 
-    // ★修正1：カテゴリー自動判別のルールを変更（「名詞の性」を「語彙」に統合）
     function getCategory(q) {
         let cat = q.category || "";
         if (cat === "名詞の性" || q.type === "gender") return "語彙";
@@ -382,7 +384,6 @@
         return cat;
     }
 
-    // ★修正2：答えが「男性」または「女性」なら、それを性別問題として扱う
     function isGenderQuestion(q) {
         return q.answer === "男性" || q.answer === "女性";
     }
@@ -459,7 +460,10 @@
         
         let qText = isGenderQuestion(q) ? (q.word || q.word_or_question) : q.word_or_question;
         document.getElementById('question-display').innerHTML = qText.replace(/\\n|\n/g, '<br>');
+        
+        // ★修正ポイント1：意味（meaning）を初期状態では隠す
         document.getElementById('meaning-display').innerHTML = (q.meaning || "").replace(/\\n|\n/g, '<br>');
+        document.getElementById('meaning-display').style.display = "none";
         
         document.getElementById('feedback').textContent = "";
         document.getElementById('feedback-area').style.display = "none";
@@ -550,6 +554,9 @@
         if (isCorrect) score++;
 
         playBeepSound(isCorrect);
+
+        // ★修正ポイント2：意味（meaning）を回答後にフワッと表示させる
+        document.getElementById('meaning-display').style.display = "block";
 
         let textToSpeak = "";
         if (isGenderQuestion(q)) {
